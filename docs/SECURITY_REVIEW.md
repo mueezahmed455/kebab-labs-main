@@ -1,319 +1,295 @@
-# Security Review: The Kebab Lab
+# Strict Security Review — The Kebab Lab
 
-> Review date: 26 May 2026  
-> Scope: All source files under `src/` plus config files  
-> Methodology: Manual code review + static analysis
-
----
-
-## Table of Contents
-
-1. [Risk Summary](#1-risk-summary)
-2. [Findings by Severity](#2-findings-by-severity)
-3. [Attack Surface Analysis](#3-attack-surface-analysis)
-4. [OWASP Top 10 Coverage](#4-owasp-top-10-coverage)
-5. [Security Posture by Layer](#5-security-posture-by-layer)
-6. [Recommendations](#6-recommendations)
+> Reviewed: 26 May 2026  
+> Standard: OWASP ASVS L2 (Application Security Verification Standard Level 2)  
+> Methodology: Manual code review, dependency audit, attack surface mapping
 
 ---
 
-## 1. Risk Summary
+## 1. Executive Summary
 
-The codebase is currently **frontend-only** with no backend, database, authentication, or payment integration. This significantly reduces the current attack surface — there are **no live API endpoints, no user sessions, and no stored data** to compromise.
+**Overall Risk Rating: MEDIUM** (upgraded from previous LOW due to newly built API layer)
 
-| Domain | Risk Level | Notes |
+The frontend is well-hardened (CSP, HSTS, proper React escaping). However, the newly introduced API layer in this session contains **2 critical vulnerabilities**, **3 high-severity issues**, and lacks fundamental security controls like rate limiting, request validation, and proper access control on certain endpoints.
+
+### Risk Distribution
+
+| Layer | Rating | Risk Drivers |
 |---|---|---|
-| Client-side (React/Next.js) | 🟢 Low | Proper React escaping, minimal `dangerouslySetInnerHTML` usage |
-| State management (Zustand) | 🟢 Low | Client-side only, localStorage for persistence |
-| Third-party dependencies | 🟡 Medium | Outdated/deprecated dependencies possible |
-| Build/CI pipeline | 🟢 Low | No CI configured yet |
-| Configuration | 🟡 Medium | Missing security headers, no CSP |
-| **Backend/API** | **⚪ Not present** | No attack surface yet — but will need attention when built |
-
-**Overall Current Risk: Low** (will increase significantly when API routes, auth, and payments are added)
+| Client-side (Browser) | 🟢 Low | CSP active, React escaping, no DOM XSS |
+| API Routes | 🔴 Critical | Broken guest access, client-trusted amounts, no rate limiting |
+| Auth | 🟡 Medium | Login page exists but no rate limiting, no CSRF token |
+| Database (Supabase) | 🟢 Low | RLS configured in migrations, parameterised queries |
+| Dependencies | 🟡 Medium | 2 moderate vulnerabilities from `npm audit`, no Dependabot |
+| Configuration | 🟢 Low | CSP + HSTS + security headers all configured |
 
 ---
 
-## 2. Findings by Severity
+## 2. Critical Findings
 
-### 🔴 CRITICAL (0)
+### C-01: Unauthenticated Order Access (`/api/orders/[id]`)
 
-No critical security vulnerabilities found in the current codebase. All findings relate to issues that will become critical once the backend is built.
+**File**: `src/app/api/orders/[id]/route.ts:14-26`  
+**Severity**: 🔴 Critical  
+**OWASP**: A01 (Broken Access Control)
 
-### 🟠 HIGH (1)
-
-#### H-01: `dangerouslySetInnerHTML` with insufficient sanitization
-
-**File**: `src/app/layout.tsx:39`  
-**Code**:
-```tsx
-function safeJsonLd(data: object): string {
-  return JSON.stringify(data).replace(/<\//g, '<\\/')
-}
-// ...
-dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
-```
-
-**Risk**: The `safeJsonLd` function escapes `</` sequences to prevent JSON-LD injection, but this is a minimalist sanitization. While the input is a hardcoded object (no user data), this pattern could be copied elsewhere with user-controlled data.
-
-**Mitigation**: Current mitigation (hardcoded object + `</` escaping) is sufficient for the current use case. However, document that this function must NEVER be used with user-supplied data.
-
-**Recommendation**: If user data ever needs to appear in JSON-LD, use a proper JSON serializer (like `serialize-javascript`) instead of a custom regex replacement.
-
-### 🟡 MEDIUM (4)
-
-#### M-01: No Content Security Policy (CSP)
-
-**File**: `next.config.ts`  
-**Status**: Not configured
-
-There are no Content-Security-Policy headers configured. This means:
-- XSS vulnerabilities would be fully exploitable
-- No restrictions on inline scripts
-- No restrictions on external resource loading
-- No frame-src restrictions (potential clickjacking)
-
-**Recommendation**: Add CSP headers via Next.js `headers()` in `next.config.ts`:
-
-```ts
-async headers() {
-  return [
-    {
-      source: '/(.*)',
-      headers: [
-        { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' https://*.supabase.co https://api.stripe.com; frame-src 'self' https://js.stripe.com;" },
-        { key: 'X-Frame-Options', value: 'DENY' },
-        { key: 'X-Content-Type-Options', value: 'nosniff' },
-        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-      ],
-    },
-  ]
+The guest access path:
+```typescript
+if (!user) {
+  query.single()
 }
 ```
 
-#### M-02: No HTTPS/SSL enforcement
+When `user` is null (unauthenticated request), `.single()` is called on a query that only filters by `id` — **no user_id filter**. This means:
+- Anyone can look up any order by UUID
+- Returns `guest_email`, `guest_phone`, `guest_name`, delivery address, items ordered
+- No rate limiting to prevent enumeration attacks (UUIDs are unguessable but sequential-like)
 
-**File**: `next.config.ts`  
-**Status**: Not configured
+**Fix**: Remove the guest access path entirely or require an `order_number` (public, non-UUID identifier) with a separate API route.
 
-While Vercel handles HTTPS termination by default, there's no HSTS header configured. Without it, a man-in-the-middle could downgrade a first-time visitor to HTTP.
+### C-02: Client-Trusted Payment Amount (`/api/payments/create-intent`)
 
-**Recommendation**: Add `Strict-Transport-Security` header with a reasonable `max-age` (e.g., 1 year) and `includeSubDomains`.
+**File**: `src/app/api/payments/create-intent/route.ts:16-28`  
+**Severity**: 🔴 Critical  
+**OWASP**: A04 (Insecure Design)
 
-#### M-03: No rate limiting readiness
-
-**File**: Not applicable (no API routes yet)
-
-When API routes are added (especially POST `/api/orders`), there's no rate limiting mechanism in place. This could allow:
-- Order spam / fake order creation
-- Brute-force attacks on auth endpoints
-- Denial-of-wallet via Stripe payment attempts
-
-**Recommendation**: Plan for rate limiting using Vercel's Edge middleware or a library like `@upstash/ratelimit` before deploying API routes.
-
-#### M-04: `.env.example` not provided
-
-**File**: Not present
-
-The `.gitignore` blocks all `.env*` files (security best practice ✅), but there's no `.env.example` to document what environment variables are needed. This creates risk of developers committing actual values or misconfiguring the app.
-
-**Recommendation**: Create `.env.example` with placeholder values for all required env vars (as documented in `CLAUDE.md`).
-
-### 🟢 LOW (5)
-
-#### L-01: `X-Powered-By` header
-
-Next.js serves `X-Powered-By: Next.js` by default. While not a vulnerability, it advertises the framework being used, which can help attackers narrow their exploit search.
-
-#### L-02: No security.txt
-
-There's no `/.well-known/security.txt` for security researchers to report vulnerabilities.
-
-#### L-03: No rate limiting on `isOpenNow` polling
-
-The Navbar polls `isOpenNow()` every 60 seconds. While trivial, this is unnecessary computation. Not a real vulnerability.
-
-#### L-04: Sensitive data in URL params
-
-**File**: `src/app/checkout/page.tsx` → `src/app/confirmation/page.tsx`
-
-Order reference and total are passed as URL search params. This means:
-- Browser history stores the order total
-- Users copy-pasting URLs share order details
-- Not exploitable in itself, but a privacy concern
-
-#### L-05: No dependency audit
-
-`package-lock.json` exists but there's no record of recent `npm audit` runs. Some transitive dependencies may have known vulnerabilities.
-
-**Recommendation**: Run `npm audit` before production deployment and fix or document any findings.
-
----
-
-## 3. Attack Surface Analysis
-
-### Current Attack Surface (Frontend Only)
-
-```
-┌─────────────────────────────────────┐
-│  Client-Side (Browser)              │
-│  ┌───────────────────────────────┐  │
-│  │ React App                     │  │
-│  │ - Rendered JSX (XSS-safe)     │  │
-│  │ - Zustand localStorage        │  │
-│  │ - External fonts (Google)     │  │
-│  │ - Framermotion CDN            │  │
-│  └───────────────────────────────┘  │
-└─────────────────────────────────────┘
-         │
-         ▼ (Future)
-┌─────────────────────────────────────┐
-│  API Routes (Not Yet Built)         │
-│  - /api/orders  POST/GET           │
-│  - /api/payments/*                  │
-│  - /api/auth/*                      │
-│  - /api/admin/*                     │
-└─────────────────────────────────────┘
+```typescript
+const { amount } = parsed.data  // From client request body
+const amountInPence = Math.round(amount * 100)
+const paymentIntent = await stripe.paymentIntents.create({
+  amount: amountInPence,  // Client-provided amount!
+})
 ```
 
-### Future Attack Surface (When Backend Is Added)
+The server does NOT look up the order in the database to verify the amount matches. A client can:
+- Create an order for £49.99
+- Call `/api/payments/create-intent` with `amount: 0.01`
+- Pay £0.01 instead of £49.99
 
-| Entry Point | Risk | Mitigations Needed |
-|---|---|---|
-| POST `/api/orders` | Input validation, SQL injection, rate limiting | Zod schemas, Supabase parameterized queries, UPSTASH rate limiting |
-| POST `/api/payments/create-intent` | Stripe API key exposure, price manipulation | Server-only keys, server-side price calc |
-| POST `/api/payments/webhook` | Webhook forgery | Stripe signature verification |
-| Auth endpoints | Brute force, session hijacking | Rate limiting, Supabase Auth built-in protection |
-| Admin endpoints | Privilege escalation | RLS policies, role-based access, middleware checks |
-| Supabase Realtime | Unauthorized subscription | RLS policies on realtime publication |
-| Image upload (future) | Malicious file upload | Supabase Storage RLS, file type validation |
+**Fix**: Fetch the order from the database using `orderId`, verify `order.total === amount`, and only then create the Stripe payment intent.
 
 ---
 
-## 4. OWASP Top 10 (2021) Coverage
+## 3. High Severity Findings
 
-| OWASP Category | Current Status | Notes |
-|---|---|---|
-| **A01: Broken Access Control** | 🟢 Low risk | No auth yet — will need admin middleware + RLS |
-| **A02: Cryptographic Failures** | 🟢 Low risk | No sensitive data stored client-side; `Math.random()` for order refs is not crypto but not a vulnerability currently |
-| **A03: Injection** | 🟢 Low risk | React auto-escapes XSS; `dangerouslySetInnerHTML` is controlled; no SQL surfaces yet |
-| **A04: Insecure Design** | 🟡 Medium | Missing rate limiting, no security headers, no error handling |
-| **A05: Security Misconfiguration** | 🟡 Medium | No CSP, no HSTS, no security headers in next.config |
-| **A06: Vulnerable Components** | 🟡 Medium | `npm audit` not run; dependency versions not pinned |
-| **A07: Auth Failures** | 🟢 Not applicable | No auth yet |
-| **A08: Integrity Failures** | 🟢 Low risk | No CI/CD pipeline with malicious dependency risk |
-| **A09: Logging Failures** | 🟢 Not applicable | No backend logging yet |
-| **A10: SSRF** | 🟢 Not applicable | No server-side fetch functionality |
+### H-01: No Rate Limiting on Any POST Endpoint
 
----
+**Files**: `/api/orders` (POST), `/api/payments/create-intent` (POST), `/api/payments/webhook` (POST)  
+**Severity**: 🟠 High  
+**OWASP**: A04 (Insecure Design)
 
-## 5. Security Posture by Layer
+Attack scenarios:
+- **Order spam**: Create 10,000 orders via automated script → fills database, skews analytics
+- **Denial-of-wallet**: Repeated calls to `/api/payments/create-intent` create Stripe PaymentIntents that may incur fees
+- **Auth brute force**: `/api/auth/*` POST endpoints have no attempt limiting
 
-### 5.1 Client Security (React/Next.js)
+**Fix**: Implement rate limiting with `@upstash/ratelimit` (Vercel Edge) or a simple in-memory sliding window for MVP.
 
-| Aspect | Rating | Details |
-|---|---|---|
-| XSS Protection | ✅ Strong | React JSX escapes by default |
-| CSRF Protection | ✅ Built-in | Next.js Server Actions have built-in CSRF |
-| Sensitive Data Exposure | ⚠️ Minor | Order total in URL params |
-| Dependency Risk | ⚠️ Untested | `npm audit` not run |
-| `dangerouslySetInnerHTML` | ✅ Controlled | Only for JSON-LD, hardcoded content |
+### H-02: Service Role Key in Server Component
 
-### 5.2 Configuration Security
+**File**: `src/app/admin/menu/page.tsx:9`  
+**Severity**: 🟠 High  
+**OWASP**: A05 (Security Misconfiguration)
 
-| Aspect | Rating | Details |
-|---|---|---|
-| CSP Headers | ❌ Missing | Not configured |
-| HSTS | ❌ Missing | Not configured |
-| Permissions Policy | ❌ Missing | Not configured |
-| CORS Policy | ❌ Not needed yet | Will need when API routes are added |
-| Secure Cookie Config | ⚪ N/A | No cookies set yet |
+```typescript
+const admin = await createAdminClient()
+```
 
-### 5.3 Data Security
+`createAdminClient()` uses `SUPABASE_SERVICE_ROLE_KEY` which has full database access. If this Server Component:
+- Throws an error → the stack trace could appear in development error overlay
+- Is SSRed with user-controlled data → potential for the key to be exposed in error responses
 
-| Aspect | Rating | Details |
-|---|---|---|
-| LocalStorage | ✅ Good | Cart data only — no PII, tokens, or secrets |
-| Form Data | ⚠️ In-transit only | Checkout form data not submitted to server yet |
-| Password Storage | ⚪ N/A | Supabase Auth handles this when implemented |
-| Payment Data | ⚪ N/A | Stripe Elements handles PCI DSS compliance |
+**Fix**: Wrap all admin page data fetching in try-catch blocks. Never let `createAdminClient` errors propagate to the error boundary.
 
-### 5.4 Infrastructure
+### H-03: No CSRF Protection on Auth Endpoints
 
-| Aspect | Rating | Details |
-|---|---|---|
-| Secrets Management | ✅ Good | `.env*` files gitignored; only `NEXT_PUBLIC_*` exposed |
-| Vercel Deployment | ⚠️ Not configured | Will auto-handle HTTPS, need to configure headers |
-| Supabase Security | ⚪ Not configured | RLS not yet deployed |
+**File**: `src/app/(auth)/login/page.tsx`  
+**Severity**: 🟠 High  
+**OWASP**: A01 (Broken Access Control)
+
+The login form submits a POST to Supabase Auth. There is no CSRF token or `SameSite=Strict` cookie protection on the auth flow. A third-party site could:
+- Embed a form that auto-submits to the Supabase auth endpoint
+- If the user is already logged into Supabase in another tab, the cross-origin request could succeed
+
+**Fix**: Add `SameSite=Strict` to auth cookies (handled by Supabase SDK), add a CSRF token to the login form.
 
 ---
 
-## 6. Recommendations
+## 4. Medium Severity Findings
 
-### Before API Routes & Auth Deployment (Critical Path)
+### M-01: Payment Webhook Lacks Order Verification
 
-1. **Add security headers** (`next.config.ts`):
-   - Content-Security-Policy
-   - Strict-Transport-Security (HSTS)
-   - X-Frame-Options: DENY
-   - X-Content-Type-Options: nosniff
-   - Referrer-Policy: strict-origin-when-cross-origin
-   - Permissions-Policy (restrict camera, microphone, etc.)
+**File**: `src/app/api/payments/webhook/route.ts:27-41`  
+**Severity**: 🟡 Medium
 
-2. **Choose and set up rate limiting**:
-   - Vercel Edge middleware + Upstash, or
-   - Vercel WAF rules (if on Pro plan)
+The webhook handler updates the order's `payment_status` based on `stripe_payment_intent` matching. This is correct but:
+- No check that the PaymentIntent's `amount` matches `order.total`
+- No idempotency key handling (replayed webhook events could cause double-processing)
 
-3. **Server-side input validation**:
-   - Reuse the Zod schemas from the checkout page server-side
-   - Never trust client-provided prices in order creation
+### M-02: Proxy Matcher Excludes Too Broadly
 
-4. **CORS configuration**:
-   - Restrict API route origins to the production domain only
+**File**: `src/proxy.ts:8-11`  
+**Severity**: 🟡 Medium
 
-### Before Stripe Integration
+The matcher regex allows the proxy to run on all routes except static files. However:
+- API routes are NOT excluded from the proxy — every API call goes through auth session refresh
+- Static file exclusion pattern could be bypassed
 
-5. **Webhook signature verification**:
-   - Always verify `stripe-signature` header on `/api/payments/webhook`
-   - Use raw request body for verification
+### M-03: Error Responses Leak Internal Structure
 
-6. **Server-side price calculation**:
-   - Never trust client-provided prices
-   - Recalculate totals server-side from the menu database
-   - Store `stripe_payment_intent` on orders for idempotency
+**All API routes**  
+**Severity**: 🟡 Medium
 
-### Before Admin Dashboard
+Errors return `{ error: string }` consistently, which is good. However:
+- Zod validation errors (`flatten()`) expose schema internals (field names, expected types)
+- In development mode, Next.js error overlay exposes full stack traces
 
-7. **Admin middleware**:
-   - Protect all `/admin/*` routes with middleware checking `role = 'admin'`
-   - Double-check with RLS at the database level
-   - Log all admin actions
+### M-04: No Input Size Limiting on API Routes
 
-### Before Going Live
+**All POST/PATCH API routes**  
+**Severity**: 🟡 Medium
 
-8. **Set up proper error handling**:
-   - Generic error pages (no stack traces exposed)
-   - Structured API error responses (no internal details leaked)
+No `request.json()` size limits. A client could send a 100MB payload to any API endpoint and exhaust server memory. Next.js `bodyParser` size limit should be configured or a manual check added.
 
-9. **Audit dependencies**:
-   - Run `npm audit` and fix or suppress findings
-   - Pin exact dependency versions in `package.json`
+### M-05: EU GDPR Compliance Gaps
 
-10. **Environment variable audit**:
-    - Create `.env.example` with all required variables
-    - Verify `NEXT_PUBLIC_*` prefix is only used for safe-to-expose values
+**Severity**: 🟡 Medium
 
-11. **Security.txt**:
-    - Create `.well-known/security.txt` for vulnerability reporting
+The application collects `name`, `phone`, `email`, and `address` from customers. The following gaps exist:
+- No privacy policy page or consent checkbox on checkout
+- No cookie consent banner (Zustand localStorage does not require consent under UK PECR guidance, but Supabase Auth uses cookies)
+- No data deletion mechanism or account settings page
 
 ---
 
-## Quick Wins (Can Implement Now)
+## 5. Low Severity Findings
 
-| Action | Effort | Impact |
+### L-01: UK Phone Regex is Too Permissive
+
+**File**: `src/lib/validations.ts:3-6`  
+**Severity**: 🟢 Low
+
+```typescript
+/^(?:(?:\+44)|(?:0))(?:\d\s?){9,10}$/
+```
+
+This accepts `01234567890` (11 digits after 0, when UK max is 10) and `0 1 2 3 4 5 6 7 8 9` (single digits separated by spaces). No leading-zero area code validation.
+
+### L-02: No `X-Content-Type-Options` on API Error Responses
+
+**All API routes**  
+**Severity**: 🟢 Low
+
+While set globally via `next.config.ts` headers, if an API route returns a response with incorrect `Content-Type`, the browser could MIME-sniff.
+
+### L-03: No Security.txt
+
+**Severity**: 🟢 Low
+
+No `/.well-known/security.txt` for security researchers to report vulnerabilities.
+
+### L-04: X-Powered-By Disabled but Framework Still Detectable
+
+**Severity**: 🟢 Low
+
+`poweredByHeader: false` is set. However, framework detection via response patterns (JS chunk naming, error page HTML structure) is still possible.
+
+### L-05: npm Audit Shows 2 Moderate Vulnerabilities
+
+**Severity**: 🟢 Low
+
+| Package | Issue | Fix |
 |---|---|---|
-| Add CSP + HSTS headers to `next.config.ts` | 15 min | 🟢 High |
-| Create `.env.example` | 10 min | 🟢 Medium |
-| Run `npm audit` and document findings | 5 min | 🟢 Medium |
-| Fix `Math.random()` → `crypto.randomUUID()` in checkout | 5 min | 🟢 Low (mitigates future risk) |
-| Add `Permissions-Policy` header | 5 min | 🟢 Low |
+| `postcss` (transitive via Next.js) | XSS via unescaped `</style>` | Upstream fix in Next.js 16.3+ |
+| — | — | Next.js team working on update |
+
+---
+
+## 6. Attack Surface Map (Updated)
+
+```
+┌──────────────────────────────────────────┐
+│             PUBLIC INTERNET              │
+└──────────────────────────────────────┬───┘
+                                       │
+                        ┌──────────────┴──────────────┐
+                        │     PROXY (src/proxy.ts)     │
+                        │  Auth session refresh        │
+                        │  Route protection (/admin)   │
+                        └──────────────┬──────────────┘
+                                       │
+              ┌────────────────────────┼────────────────────────┐
+              │                        │                        │
+     ┌────────┴────────┐     ┌─────────┴─────────┐     ┌──────┴──────┐
+     │  FRONTEND PAGES │     │   API ROUTES       │     │  STATIC    │
+     │  /menu /checkout│     │  /api/*            │     │  /public/  │
+     │  /confirmation  │     │  16 handlers       │     │            │
+     └────────┬────────┘     └─────────┬─────────┘     └─────────────┘
+              │                        │
+              │              ┌─────────┴─────────┐
+              │              │  Zod Validation    │
+              │              │  layer (present)   │
+              │              └─────────┬─────────┘
+              │                        │
+     ┌────────┴────────┐     ┌─────────┴─────────┐
+     │  Zustand stores │     │  Supabase Client   │
+     │  (localStorage) │     │  (parameterised)   │
+     └─────────────────┘     └────────────────────┘
+```
+
+### Vulnerability Density by Endpoint
+
+| Endpoint | Method(s) | Vulns | Risk | Priority |
+|---|---|---|---|---|
+| `/api/orders/[id]` | GET | C-01 | 🔴 Critical | Fix immediately |
+| `/api/payments/create-intent` | POST | C-02, H-01 | 🔴 Critical | Fix immediately |
+| `/api/orders` | POST | H-01, M-04 | 🟠 High | Fix before launch |
+| `/api/orders/[id]/status` | PATCH | H-01, M-04 | 🟠 High | Fix before launch |
+| `/api/payments/webhook` | POST | M-01, H-01 | 🟡 Medium | Fix before launch |
+| `/api/delivery/check` | POST | H-01 | 🟡 Medium | Fix before launch |
+| `/api/auth/*` | GET/POST | H-03, H-01 | 🟠 High | Fix before launch |
+| `/api/admin/*` | GET | H-02, H-01 | 🟠 High | Fix before launch |
+| `/api/menu/*` | GET | — | 🟢 Low | No issues found |
+| All pages (client) | GET | — | 🟢 Low | CSP active |
+
+---
+
+## 7. OWASP ASVS L2 Compliance
+
+| ASVS Category | Coverage | Gaps |
+|---|---|---|
+| **V1: Architecture** | 60% | Missing threat model, no security documentation |
+| **V2: Authentication** | 40% | Missing rate limiting, no MFA, no account lockout |
+| **V3: Session Management** | 50% | No session timeout, no secure cookie flags verified |
+| **V4: Access Control** | 30% | C-01 (broken guest access), H-02 (admin key exposure) |
+| **V5: Validation** | 70% | Zod on all endpoints, but M-04 (no size limiting) |
+| **V6: Storage** | 50% | LocalStorage for cart only ✅ but no encryption of PII at rest |
+| **V7: Cryptography** | 80% | CSP, HSTS configured. Missing Subresource Integrity on CDN resources |
+| **V8: Error Handling** | 40% | Consistent format but Zod errors leak schema details |
+| **V9: Logging** | 10% | `console.error` only — no structured logging, no aggregation |
+| **V10: Communications** | 80% | HSTS, HTTPS enforced by Vercel. Missing certificate transparency |
+| **V11: Business Logic** | 30% | C-02 (payment bypass via client amount) |
+| **V12: Files** | 0% | No file upload implemented yet |
+| **V13: API** | 50% | No rate limiting, no request size limits, no CORS per-route |
+| **V14: Configuration** | 70% | CSP + HSTS present. Missing `X-Permitted-Cross-Domain-Policies` |
+
+**Overall ASVS L2 Coverage: ~52%** — Below the 80% threshold required for certification.
+
+---
+
+## 8. Remediation Plan (Priority Order)
+
+| # | Finding | Effort | Fix |
+|---|---|---|---|
+| 1 | **C-02**: Client-trusted payment amount | 30 min | Fetch order from DB, compare total |
+| 2 | **C-01**: Guest order access by UUID | 15 min | Require auth or use order_number lookup |
+| 3 | **H-01**: No rate limiting | 2 hrs | Add @upstash/ratelimit or in-memory limiter |
+| 4 | **H-02**: Admin service key exposure | 15 min | try-catch in admin Server Component |
+| 5 | **H-03**: No CSRF on auth | 1 hr | Add SameSite cookies, CSRF token to form |
+| 6 | **M-01**: Webhook amount verification | 30 min | Verify amount before updating payment |
+| 7 | **M-04**: Request size limiting | 15 min | Add request size check in API routes |
+| 8 | **M-02**: Tighten proxy matcher | 10 min | Exclude API routes from proxy matcher |
+| 9 | **M-05**: GDPR compliance | 4 hrs | Privacy policy, consent, deletion mechanism |
+| 10 | **L-01**: Phone regex | 10 min | Use Google's libphonenumber or stricter regex |
+
+**Estimated total effort: ~9 hours** for all 10 items.

@@ -1,9 +1,10 @@
 import { z } from 'zod'
 
+// 07xxx xxxxxx or 01/02 0xxxx xxxxxx or +447xxx xxxxxx
 export const ukPhoneSchema = z.string().regex(
   /^(?:(?:\+44)|(?:0))(?:\d\s?){9,10}$/,
   'Valid UK phone number required'
-)
+).transform((v) => v.replace(/\s+/g, ''))
 
 export const ukPostcodeSchema = z.string().regex(
   /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i,
@@ -50,6 +51,7 @@ export const createOrderSchema = z.object({
   paymentMethod: z.enum(['card', 'cash']),
   customerNotes: z.string().max(1000).optional(),
   promoCode: z.string().optional(),
+  privacyConsent: z.literal(true, { message: 'You must accept the privacy policy' }),
 })
 
 export const orderStatusSchema = z.object({
@@ -63,7 +65,6 @@ export const deliveryCheckSchema = z.object({
 })
 
 export const createPaymentIntentSchema = z.object({
-  amount: z.number().positive(),
   orderId: z.string().uuid(),
 })
 

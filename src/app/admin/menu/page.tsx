@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/server'
 import { MenuEditor } from '@/components/admin/MenuEditor'
 import type { Metadata } from 'next'
@@ -6,7 +7,12 @@ export const metadata: Metadata = { title: 'Menu — Admin' }
 export const revalidate = 60
 
 export default async function AdminMenuPage() {
-  const admin = await createAdminClient()
+  let admin
+  try {
+    admin = await createAdminClient()
+  } catch {
+    redirect('/login')
+  }
   const { data: items } = await admin
     .from('menu_items')
     .select('id, name, base_price, is_available, is_featured, is_vegetarian, is_spicy, categories(name)')

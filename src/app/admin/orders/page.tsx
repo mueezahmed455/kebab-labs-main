@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/server'
 import { OrdersTable } from '@/components/admin/OrdersTable'
 import type { Metadata } from 'next'
@@ -19,7 +20,12 @@ interface OrderRow {
 }
 
 export default async function AdminOrdersPage() {
-  const admin = await createAdminClient()
+  let admin
+  try {
+    admin = await createAdminClient()
+  } catch {
+    redirect('/login')
+  }
   const { data: orders } = await admin
     .from('orders')
     .select('id, order_number, created_at, status, total, order_type, guest_name, guest_phone, order_items(name, quantity, unit_price)')

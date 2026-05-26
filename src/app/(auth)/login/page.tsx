@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
+import { generateCsrfToken } from '@/lib/csrf'
 import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
 
@@ -35,6 +36,8 @@ export default function LoginPage() {
   const router = useRouter()
   const [serverError, setServerError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const [csrfToken] = useState(generateCsrfToken)
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -83,6 +86,9 @@ export default function LoginPage() {
               {serverError}
             </div>
           )}
+
+          {/* Hidden CSRF token */}
+          <input type="hidden" name="csrf_token" value={csrfToken} />
 
           <Field label="Email Address" error={errors.email?.message}>
             <div className="relative">

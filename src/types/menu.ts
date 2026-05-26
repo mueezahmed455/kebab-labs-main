@@ -5,7 +5,7 @@ export interface MenuVariant {
 
 export interface MenuItem {
   id: string
-  cat: string
+  cat: Category['id']
   name: string
   desc: string
   price: number
@@ -14,6 +14,7 @@ export interface MenuItem {
   vegan?: boolean
   spicy?: boolean
   sizes?: MenuVariant[]
+  image?: string
 }
 
 export interface Category {

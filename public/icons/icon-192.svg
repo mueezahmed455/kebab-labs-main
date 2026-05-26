@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="32" fill="#07080f"/>
+  <rect width="192" height="192" rx="32" fill="url(#g)" opacity="0.4"/>
+  <defs>
+    <radialGradient id="g" cx="50%" cy="0%" r="100%">
+      <stop offset="0%" stop-color="#84cc16" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#07080f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Flask icon -->
+  <path d="M80 40 L80 88 L52 136 Q46 148 58 154 L134 154 Q146 148 140 136 L112 88 L112 40 Z" fill="none" stroke="#84cc16" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M74 104 L118 104 Q130 124 124 138 L68 138 Q62 124 74 104 Z" fill="#84cc16" opacity="0.25"/>
+  <line x1="74" y1="40" x2="118" y2="40" stroke="#84cc16" stroke-width="6" stroke-linecap="round"/>
+</svg>

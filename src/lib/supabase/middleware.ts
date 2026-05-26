@@ -5,6 +5,11 @@ import type { CookieOptions } from '@supabase/ssr'
 type Cookie = { name: string; value: string; options?: CookieOptions }
 
 export async function updateSession(request: NextRequest) {
+  // No-op in mock mode (env vars not set yet)
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(

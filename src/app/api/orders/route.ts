@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { createOrderSchema } from '@/lib/validations'
+import { apiError, apiSuccess } from '@/lib/api-error'
+import { rateLimit } from '@/lib/rate-limit'
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,7 +10,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return apiError(401, 'Authentication required')
     }
 
     const { data: orders, error } = await supabase
@@ -20,29 +22,34 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
-    return NextResponse.json(orders)
+    return apiSuccess(orders)
   } catch (error) {
     console.error('Orders fetch error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch orders' },
-      { status: 500 }
-    )
+    return apiError(500, 'Failed to fetch orders')
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const parsed = createOrderSchema.safeParse(body)
+    const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
+    const { allowed } = rateLimit(`order-create:${ip}`, 3, 60_000)
+    if (!allowed) return apiError(429, 'Too many requests. Try again later.')
 
+    const body = await request.json()
+    if (JSON.stringify(body).length > 50_240) return apiError(413, 'Request too large')
+
+    const parsed = createOrderSchema.safeParse(body)
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: parsed.error.flatten() },
-        { status: 400 }
-      )
+      return apiError(400, 'Validation failed', parsed.error.flatten())
     }
 
     const { orderType, contact, deliveryAddress, items, subtotal, deliveryFee, total, paymentMethod, customerNotes } = parsed.data
+
+    // Server-side total verification: recalculate from items
+    const calculatedSubtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+    if (Math.abs(calculatedSubtotal - subtotal) > 0.01) {
+      return apiError(400, 'Subtotal does not match item prices')
+    }
 
     const admin = await createAdminClient()
 
@@ -52,10 +59,7 @@ export async function POST(request: NextRequest) {
         p_postcode: deliveryAddress.postcode,
       })
       if (!valid) {
-        return NextResponse.json(
-          { error: 'Postcode is outside delivery area' },
-          { status: 400 }
-        )
+        return apiError(400, 'Postcode is outside delivery area')
       }
     }
 
@@ -117,12 +121,9 @@ export async function POST(request: NextRequest) {
       status: 'pending',
     })
 
-    return NextResponse.json(order, { status: 201 })
+    return apiSuccess(order, 201)
   } catch (error) {
     console.error('Order creation error:', error)
-    return NextResponse.json(
-      { error: 'Failed to create order' },
-      { status: 500 }
-    )
+    return apiError(500, 'Failed to create order')
   }
 }

@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { formatCurrency } from '@/lib/utils/formatting'
 import { Eye, EyeOff, Pencil } from 'lucide-react'
@@ -62,6 +63,12 @@ export function MenuEditor({ items: initialItems }: MenuEditorProps) {
             <p className="text-brand-muted text-xs mt-0.5">{item.categories?.name}</p>
           </div>
           <span className="text-brand-green font-display text-lg tracking-wider">{formatCurrency(item.base_price)}</span>
+          <Link
+            href={`/admin/menu/${item.id}`}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-brand-border text-brand-muted hover:border-brand-green/30 hover:text-brand-green text-xs font-semibold transition-colors"
+          >
+            <Pencil className="w-3 h-3" /> Edit
+          </Link>
           <button
             onClick={() => toggleAvailability(item)}
             disabled={toggling === item.id}

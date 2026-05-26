@@ -12,6 +12,7 @@ export interface CheckoutForm {
   postcode: string
   notes: string
   payment: 'card' | 'cash'
+  privacyConsent: boolean
 }
 
 interface CheckoutStore {
@@ -34,6 +35,7 @@ const defaultForm: CheckoutForm = {
   postcode: '',
   notes: '',
   payment: 'card',
+  privacyConsent: false,
 }
 
 export const useCheckout = create<CheckoutStore>()(

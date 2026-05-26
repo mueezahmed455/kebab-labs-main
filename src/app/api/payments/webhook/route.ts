@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { apiError, apiSuccess } from '@/lib/api-error'
 
 export async function POST(request: NextRequest) {
   try {
@@ -6,7 +7,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('stripe-signature')
 
     if (!signature) {
-      return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 })
+      return apiError(400, 'Missing stripe-signature header')
     }
 
     const stripe = await import('@/lib/stripe').then((m) => m.stripe)
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret!)
     } catch {
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+      return apiError(400, 'Invalid signature')
     }
 
     const { createAdminClient } = await import('@/lib/supabase/server')
@@ -25,28 +26,42 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'payment_intent.succeeded': {
         const pi = event.data.object
-        await (admin as any)
+        const amountPaid = pi.amount_received
+
+        // Verify amount-received matches stored order total
+        const orderId = pi.metadata?.order_id
+        if (!orderId) break
+
+        const { data: order } = await (admin as any)
           .from('orders')
-          .update({ payment_status: 'paid', stripe_payment_intent: pi.id })
-          .eq('stripe_payment_intent', pi.id)
+          .select('total')
+          .eq('id', orderId)
+          .single()
+
+        if (order && Math.round(order.total * 100) === amountPaid) {
+          await (admin as any)
+            .from('orders')
+            .update({ payment_status: 'paid', stripe_payment_intent: pi.id })
+            .eq('id', orderId)
+        }
         break
       }
       case 'payment_intent.payment_failed': {
         const pi = event.data.object
-        await (admin as any)
-          .from('orders')
-          .update({ payment_status: 'failed' })
-          .eq('stripe_payment_intent', pi.id)
+        const orderId = pi.metadata?.order_id
+        if (orderId) {
+          await (admin as any)
+            .from('orders')
+            .update({ payment_status: 'failed' })
+            .eq('id', orderId)
+        }
         break
       }
     }
 
-    return NextResponse.json({ received: true })
+    return apiSuccess({ received: true })
   } catch (error) {
     console.error('Webhook error:', error)
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    )
+    return apiError(500, 'Webhook handler failed')
   }
 }

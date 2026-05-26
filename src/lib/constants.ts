@@ -1,14 +1,17 @@
+import { BRAND } from '@/lib/data/brand'
+
+// Derived from BRAND — single source of truth
 export const BUSINESS_CONFIG = {
-  name: 'The Kebab Lab',
-  phone: '01282 454 626',
-  address: '123 Colne Road, Burnley, BB10 1LN',
-  postcode: 'BB10 1LN',
-  coordinates: { lat: 53.789, lng: -2.247 },
+  name: BRAND.name,
+  phone: BRAND.phoneRaw,
+  address: BRAND.address,
+  postcode: BRAND.postcode,
+  coordinates: BRAND.coordinates,
 
   openingHours: {
     0: { open: '16:00', close: '00:40', isOpen: true },
     1: { open: '16:00', close: '00:40', isOpen: true },
-    2: { open: null,    close: null,    isOpen: false },
+    2: { open: null as string | null, close: null as string | null, isOpen: false },
     3: { open: '16:00', close: '00:40', isOpen: true },
     4: { open: '16:00', close: '00:40', isOpen: true },
     5: { open: '16:00', close: '00:40', isOpen: true },
@@ -16,9 +19,9 @@ export const BUSINESS_CONFIG = {
   },
 
   delivery: {
-    minimumOrder: 12.00,
-    fee: 1.99,
-    radiusMiles: 3,
+    minimumOrder: BRAND.delivery.minimumOrder,
+    fee: BRAND.delivery.fee,
+    radiusMiles: BRAND.delivery.radiusMiles,
     estimatedTime: 45,
   },
 

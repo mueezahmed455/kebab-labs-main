@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { apiError, apiSuccess } from '@/lib/api-error'
 
 export async function GET(
   _request: NextRequest,
@@ -11,30 +12,24 @@ export async function GET(
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const query = supabase
+    if (!user) {
+      return apiError(401, 'Authentication required to view order details')
+    }
+
+    const { data: order, error } = await supabase
       .from('orders')
       .select('*, order_items(*), order_status_history(*)')
       .eq('id', id)
-
-    // Guests can access by order_number too
-    if (!user) {
-      query.single()
-    } else {
-      query.eq('user_id', user.id).single()
-    }
-
-    const { data: order, error } = await query
+      .eq('user_id', user.id)
+      .single()
 
     if (!order || error) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+      return apiError(404, 'Order not found')
     }
 
-    return NextResponse.json(order)
+    return apiSuccess(order)
   } catch (error) {
     console.error('Order fetch error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch order' },
-      { status: 500 }
-    )
+    return apiError(500, 'Failed to fetch order')
   }
 }

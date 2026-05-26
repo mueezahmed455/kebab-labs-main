@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { orderStatusSchema } from '@/lib/validations'
+import { apiError, apiSuccess } from '@/lib/api-error'
+import { rateLimit } from '@/lib/rate-limit'
 
 export async function PATCH(
   request: NextRequest,
@@ -9,14 +11,15 @@ export async function PATCH(
   const { id } = await params
 
   try {
+    const ip = request.headers.get('x-forwarded-for') ?? 'unknown'
+    const { allowed } = rateLimit(`order-status:${ip}`, 20, 60_000)
+    if (!allowed) return apiError(429, 'Too many requests')
+
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    if (!user) return apiError(401, 'Unauthorized')
 
-    // Check admin role
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -24,28 +27,23 @@ export async function PATCH(
       .single()
 
     if ((profile as { role: string } | null)?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return apiError(403, 'Forbidden')
     }
 
     const body = await request.json()
-    const parsed = orderStatusSchema.safeParse(body)
+    if (JSON.stringify(body).length > 5_120) return apiError(413, 'Request too large')
 
+    const parsed = orderStatusSchema.safeParse(body)
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: parsed.error.flatten() },
-        { status: 400 }
-      )
+      return apiError(400, 'Validation failed', parsed.error.flatten())
     }
 
     const { status, estimatedTime } = parsed.data
-
     const admin = await createAdminClient()
 
     const updateData: Record<string, string | number | null> = { status }
-
     if (estimatedTime) updateData.estimated_time = estimatedTime
 
-    // Set timestamp for the new status
     const now = new Date().toISOString()
     switch (status) {
       case 'confirmed': updateData.confirmed_at = now; break
@@ -61,12 +59,9 @@ export async function PATCH(
 
     if (error) throw error
 
-    return NextResponse.json({ success: true })
+    return apiSuccess({ success: true })
   } catch (error) {
     console.error('Order status update error:', error)
-    return NextResponse.json(
-      { error: 'Failed to update order status' },
-      { status: 500 }
-    )
+    return apiError(500, 'Failed to update order status')
   }
 }

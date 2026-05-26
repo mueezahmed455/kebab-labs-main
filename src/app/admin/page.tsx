@@ -1,5 +1,6 @@
+import { redirect } from 'next/navigation'
 import { PoundSterling, ShoppingBag, TrendingUp, Users } from 'lucide-react'
-import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { OrdersTable } from '@/components/admin/OrdersTable'
 import { RevenueChart } from '@/components/admin/RevenueChart'
@@ -23,7 +24,12 @@ interface OrderRow {
 }
 
 export default async function AdminDashboard() {
-  const admin = await createAdminClient()
+  let admin
+  try {
+    admin = await createAdminClient()
+  } catch {
+    redirect('/login')
+  }
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)

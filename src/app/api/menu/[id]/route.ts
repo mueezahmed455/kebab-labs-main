@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { MENU_ITEMS } from '@/lib/data/menu'
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    const item = MENU_ITEMS.find((m) => m.id === id)
+    if (!item) return NextResponse.json({ error: 'Menu item not found' }, { status: 404 })
+    return NextResponse.json({ ...item, base_price: item.basePrice, is_available: true, menu_variants: [] })
+  }
 
   try {
     const supabase = await createClient()

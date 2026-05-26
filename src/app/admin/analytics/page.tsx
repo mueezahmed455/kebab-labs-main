@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/server'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { RevenueChart } from '@/components/admin/RevenueChart'
@@ -9,7 +10,12 @@ export const metadata: Metadata = { title: 'Analytics — Admin' }
 export const revalidate = 300
 
 export default async function AdminAnalyticsPage() {
-  const admin = await createAdminClient()
+  let admin
+  try {
+    admin = await createAdminClient()
+  } catch {
+    redirect('/login')
+  }
 
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)

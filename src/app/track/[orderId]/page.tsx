@@ -19,6 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function TrackOrderPage({ params }: Props) {
   const { orderId } = await params
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) notFound()
+
   const supabase = await createClient()
 
   const { data: order, error } = await supabase

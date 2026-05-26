@@ -1,5 +1,6 @@
 'use client'
-import { useState, useCallback, useEffect } from 'react'
+import Image from 'next/image'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Plus, Minus } from 'lucide-react'
 import type { MenuItem, Category } from '@/types/menu'
@@ -19,11 +20,42 @@ export function ItemModal({ item, category, onClose }: ItemModalProps) {
   const [quantity, setQuantity] = useState(1)
   const { addItem } = useCart()
 
+  const modalRef = useRef<HTMLDivElement>(null)
+
   // Reset state when a different item opens
   useEffect(() => {
     setSelectedSizeIdx(0)
     setQuantity(1)
   }, [item?.id])
+
+  // Focus trap
+  useEffect(() => {
+    if (!item) return
+    const el = modalRef.current
+    if (!el) return
+    const focusable = el.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    first?.focus()
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== 'Tab') return
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last?.focus()
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault()
+          first?.focus()
+        }
+      }
+    }
+    el.addEventListener('keydown', handleTab)
+    return () => el.removeEventListener('keydown', handleTab)
+  }, [item])
 
   const selectedVariant = item?.sizes?.[selectedSizeIdx]
   const unitPrice = selectedVariant?.price ?? item?.price ?? 0
@@ -63,23 +95,33 @@ export function ItemModal({ item, category, onClose }: ItemModalProps) {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-label={item?.name ? `${item.name} — choose size and quantity` : 'Item details'}
           >
-            <div className="w-full max-w-md bg-brand-surface border border-brand-border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl">
+            <div ref={modalRef} className="w-full max-w-md bg-brand-surface border border-brand-border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl">
               {/* Header image area */}
               <div
-                className="relative h-44 flex items-center justify-center"
-                style={{ background: `linear-gradient(135deg, ${category?.accentColor ?? '#84cc16'}22, #07080f)` }}
+                className="relative h-52 overflow-hidden"
+                style={!item.image ? { background: `linear-gradient(135deg, ${category?.accentColor ?? '#84cc16'}22, #07080f)` } : undefined}
               >
-                <span className="text-8xl">{category?.icon ?? '🥙'}</span>
+                {item.image ? (
+                  <>
+                    <Image src={item.image} alt={item.name} fill sizes="448px" className="object-cover" priority />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  </>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-8xl">{category?.icon ?? '🥙'}</div>
+                )}
                 <button
                   onClick={onClose}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full glass flex items-center justify-center hover:bg-white/10 transition-colors"
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center hover:bg-black/60 transition-colors z-10"
                   aria-label="Close"
                 >
-                  <X className="w-4 h-4 text-brand-muted" />
+                  <X className="w-4 h-4 text-white" />
                 </button>
                 {item.badge && (
-                  <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-green/20 text-brand-green border border-brand-green/30">
+                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-brand-green text-brand-dark z-10">
                     {item.badge}
                   </span>
                 )}

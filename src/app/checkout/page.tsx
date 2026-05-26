@@ -255,6 +255,24 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* GDPR consent */}
+              <label className="flex items-start gap-3 bg-brand-card border border-brand-border rounded-2xl p-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.privacyConsent}
+                  onChange={(e) => updateForm({ privacyConsent: e.target.checked })}
+                  className="mt-0.5 w-4 h-4 rounded border-brand-border bg-brand-surface text-brand-green focus:ring-brand-green"
+                />
+                <div className="text-sm">
+                  <span className="text-brand-white font-medium">Privacy consent</span>
+                  <p className="text-brand-dim text-xs mt-0.5">
+                    I agree to my data being stored and used in accordance with the{' '}
+                    <a href="/privacy" target="_blank" className="text-brand-green hover:underline">Privacy Policy</a>.
+                    Your details are only used to process your order and will not be shared with third parties.
+                  </p>
+                </div>
+              </label>
+
               {/* Payment method */}
               <div className="bg-brand-card border border-brand-border rounded-2xl p-5 space-y-3">
                 <p className="text-brand-muted text-xs font-medium tracking-widest uppercase">Payment Method</p>
@@ -284,7 +302,8 @@ export default function CheckoutPage() {
 
               <button
                 onClick={handlePlaceOrder}
-                className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-brand-green text-brand-dark font-bold hover:bg-brand-green-dark transition-all active:scale-95 text-base"
+                disabled={!form.privacyConsent}
+                className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-brand-green text-brand-dark font-bold hover:bg-brand-green-dark transition-all active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Place Order — {formatCurrency(tot)}
               </button>

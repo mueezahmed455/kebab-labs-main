@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     images: ['/og-image.jpg'],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
-  icons: { icon: '/favicon.ico', apple: '/apple-touch-icon.png' },
+  icons: { icon: '/icons/icon-192.svg', apple: '/icons/icon-192.svg' },
   alternates: { canonical: 'https://thekebablabonline.co.uk' },
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Kebab Lab' },

@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { MENU_ITEMS, CATEGORIES } from '@/lib/data/menu'
 
 export async function GET() {
+  // Serve static data when Supabase is not configured
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    return NextResponse.json({ categories: CATEGORIES, items: MENU_ITEMS })
+  }
+
   try {
     const supabase = await createClient()
 
@@ -24,9 +30,6 @@ export async function GET() {
     return NextResponse.json({ categories, items })
   } catch (error) {
     console.error('Menu fetch error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch menu' },
-      { status: 500 }
-    )
+    return NextResponse.json({ categories: CATEGORIES, items: MENU_ITEMS })
   }
 }

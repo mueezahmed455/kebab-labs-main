@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import type { MenuItem, Category } from '@/types/menu'
@@ -30,28 +31,56 @@ export function ItemCard({ item, category, onOpenModal }: ItemCardProps) {
     }
   }
 
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleClick()
+    }
+  }
+
   return (
     <motion.div
-      whileHover={{ y: -3, transition: { duration: 0.2 } }}
-      className="group bg-brand-card border border-brand-border rounded-2xl overflow-hidden hover:border-brand-green/30 hover:shadow-xl hover:shadow-black/30 transition-all cursor-pointer"
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      className="group bg-brand-card border border-brand-border rounded-2xl overflow-hidden hover:border-brand-green/40 hover:shadow-2xl hover:shadow-black/40 transition-all cursor-pointer"
       onClick={handleClick}
+      onKeyDown={onKeyDown}
+      role="button"
+      tabIndex={0}
     >
       {/* Image area */}
       <div
-        className="h-36 flex items-center justify-center text-5xl relative"
-        style={{ background: `linear-gradient(135deg, ${category.accentColor}20, #07080f)` }}
+        className="h-40 relative overflow-hidden"
+        style={!item.image ? { background: `linear-gradient(135deg, ${category.accentColor}25, #07080f)` } : undefined}
       >
+        {item.image ? (
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="h-full flex items-center justify-center text-5xl">{category.icon}</div>
+        )}
+        {/* Gradient overlay */}
+        {item.image && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        )}
         {item.badge && (
-          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-green/20 text-brand-green border border-brand-green/30 leading-tight">
+          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-green text-brand-dark leading-tight z-10">
             {item.badge}
           </span>
         )}
         {(item.vegetarian || item.spicy) && (
-          <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${item.vegetarian ? 'bg-green-900/40 text-green-400 border-green-700/30' : 'bg-red-900/40 text-red-400 border-red-700/30'}`}>
+          <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold border z-10 ${
+            item.vegetarian
+              ? 'bg-green-900/80 text-green-300 border-green-700/40'
+              : 'bg-red-900/80 text-red-300 border-red-700/40'
+          }`}>
             {item.vegetarian ? '🌿' : '🌶️'}
           </span>
         )}
-        {category.icon}
       </div>
 
       {/* Body */}
@@ -64,8 +93,8 @@ export function ItemCard({ item, category, onOpenModal }: ItemCardProps) {
           <span className="font-display text-lg text-brand-green leading-none">
             {item.sizes ? `From ${formatCurrency(item.sizes[0].price)}` : formatCurrency(item.price)}
           </span>
-          <div className="w-7 h-7 rounded-full bg-brand-green/10 border border-brand-green/30 flex items-center justify-center group-hover:bg-brand-green/20 transition-colors">
-            <Plus className="w-3.5 h-3.5 text-brand-green" />
+          <div className="w-7 h-7 rounded-full bg-brand-green/10 border border-brand-green/30 flex items-center justify-center group-hover:bg-brand-green group-hover:border-brand-green transition-all">
+            <Plus className="w-3.5 h-3.5 text-brand-green group-hover:text-brand-dark transition-colors" />
           </div>
         </div>
       </div>
