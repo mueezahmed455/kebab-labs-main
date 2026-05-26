@@ -1,0 +1,365 @@
+<h2>The Kebab Lab — Feature Enhancement Board</h2>
+<p class="subtitle">Select every feature category you want to include. We'll design the full site around your picks.</p>
+
+<style>
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .feature-category {
+    background: #1a2234;
+    border: 1.5px solid #1e293b;
+    border-radius: 14px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+  }
+  .feature-category:hover { border-color: #84cc16; }
+  .feature-category.selected { border-color: #84cc16; background: #1c2d12; }
+  .feature-category.selected .cat-icon { filter: none; }
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .cat-icon { font-size: 26px; }
+  .cat-title { font-weight: 700; font-size: 15px; color: #f8fafc; }
+  .cat-badge {
+    margin-left: auto;
+    background: #84cc16;
+    color: #0a0f1e;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    display: none;
+  }
+  .feature-category.selected .cat-badge { display: block; }
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .feature-list li {
+    font-size: 13px;
+    color: #94a3b8;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    line-height: 1.4;
+  }
+  .feature-list li::before {
+    content: '›';
+    color: #84cc16;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #84cc16;
+    margin: 28px 0 10px;
+  }
+</style>
+
+<div class="section-label">🛍️ Customer Marketing & Acquisition</div>
+<div class="feature-grid" data-multiselect>
+
+  <div class="feature-category" data-choice="loyalty" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">⭐</span>
+      <span class="cat-title">Loyalty Points System</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Earn "Lab Points" on every order (e.g. 1pt per £1)</li>
+      <li>Points dashboard in customer account</li>
+      <li>Redeem points for discounts at checkout</li>
+      <li>Tier levels: Regular → Frequent → VIP</li>
+      <li>Points expiry nudge emails</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="referral" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">🎁</span>
+      <span class="cat-title">Referral Program</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Unique referral link per customer</li>
+      <li>Referee gets £3 off first order</li>
+      <li>Referrer earns £3 credit when referee orders</li>
+      <li>Share via WhatsApp, copy link, or SMS</li>
+      <li>Referral stats in account page</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="flash-deals" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">⚡</span>
+      <span class="cat-title">Flash Deals & Countdown Offers</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Admin creates time-limited deals (e.g. £2 off pizzas until 8pm)</li>
+      <li>Live countdown timer on homepage & menu</li>
+      <li>Deal banner auto-appears when deal is active</li>
+      <li>Scheduled deals (set and forget)</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="social-proof" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">🔥</span>
+      <span class="cat-title">Social Proof & FOMO Triggers</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>"47 orders placed today" live counter on homepage</li>
+      <li>"🔥 Popular right now" tag on trending items</li>
+      <li>Toast: "Someone in Burnley just ordered Kobeda"</li>
+      <li>"X people viewing this item" on menu cards</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="email-capture" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">📧</span>
+      <span class="cat-title">Email Capture + First Order Discount</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Exit-intent popup: "Get 10% off your first order"</li>
+      <li>Email sign-up in footer with promo code reward</li>
+      <li>Welcome email sequence via Resend</li>
+      <li>Abandoned cart recovery email (2hr delay)</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="reviews" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">⭐</span>
+      <span class="cat-title">Reviews & Social Trust</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Post-delivery review prompt (email + in-app)</li>
+      <li>Star ratings per item and overall restaurant</li>
+      <li>Photo reviews (upload image with review)</li>
+      <li>Reviews carousel on homepage</li>
+      <li>Admin approval workflow</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="section-label">✨ UX & Interactivity</div>
+<div class="feature-grid" data-multiselect>
+
+  <div class="feature-category" data-choice="animations" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">🎬</span>
+      <span class="cat-title">Premium Animations & Motion</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Framer Motion scroll-reveal on every section</li>
+      <li>Menu cards 3D tilt on hover</li>
+      <li>Cart item fly-to-cart animation on add</li>
+      <li>Smooth page transitions</li>
+      <li>Spring physics on cart drawer open/close</li>
+      <li>Particle/ember effect on hero section</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="smart-search" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">🔍</span>
+      <span class="cat-title">Smart Search & Filtering</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Fuzzy search across all menu items</li>
+      <li>Dietary filters: Vegetarian / Vegan / Spicy / Halal</li>
+      <li>Price range filter</li>
+      <li>Search highlights matching text in results</li>
+      <li>Recent searches saved locally</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="upsell" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">🛒</span>
+      <span class="cat-title">Smart Upsells & Suggestions</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>"Add chips for £2?" prompt when adding kebab to cart</li>
+      <li>"Upgrade to meal deal for £2 more" at checkout</li>
+      <li>"Frequently ordered together" section on item modal</li>
+      <li>Minimum order progress bar ("£3 more to unlock delivery")</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="pwa" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">📱</span>
+      <span class="cat-title">PWA + Push Notifications</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Install to home screen (iOS & Android)</li>
+      <li>Push notification: order status updates</li>
+      <li>Push notification: flash deal alerts</li>
+      <li>Offline menu browsing (service worker cache)</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="customizer" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">🧪</span>
+      <span class="cat-title">Build-Your-Own / Customizer</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Visual combo builder: pick protein + base + sauce + sides</li>
+      <li>Real-time price updates as you build</li>
+      <li>Save custom combos to favourites</li>
+      <li>Share your combo via link</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="favourites" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">❤️</span>
+      <span class="cat-title">Favourites & Quick Reorder</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Heart icon on every menu item to save</li>
+      <li>Favourites tab in account page</li>
+      <li>"Order Again" button on past orders</li>
+      <li>Re-order adds all items back to cart in one click</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="section-label">⚙️ Operations & Admin</div>
+<div class="feature-grid" data-multiselect>
+
+  <div class="feature-category" data-choice="kds" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">🖥️</span>
+      <span class="cat-title">Kitchen Display System (KDS)</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Dedicated full-screen kitchen view at /kitchen</li>
+      <li>Orders appear as cards, colour-coded by age</li>
+      <li>One-tap to mark item ready / order complete</li>
+      <li>Auto-sorts by order time, screams if overdue</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="dynamic-wait" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">⏱️</span>
+      <span class="cat-title">Dynamic Wait Time Estimates</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Admin sets current queue load (quiet / normal / busy)</li>
+      <li>Wait time shown at checkout and on tracking page</li>
+      <li>Accurate estimates reduce "where's my order?" calls</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="sms" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">💬</span>
+      <span class="cat-title">WhatsApp / SMS Notifications</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>WhatsApp message on order confirmed, ready & dispatched</li>
+      <li>Floating WhatsApp button for direct contact</li>
+      <li>SMS fallback via Twilio if no WhatsApp</li>
+      <li>Admin notification on new order (WhatsApp)</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="analytics" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">📊</span>
+      <span class="cat-title">Enhanced Analytics Dashboard</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Hourly revenue heatmap (peak times visualised)</li>
+      <li>Category performance breakdown</li>
+      <li>Customer retention rate</li>
+      <li>Average order value trend</li>
+      <li>Promo code performance</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="section-label">🌐 SEO & Discoverability</div>
+<div class="feature-grid" data-multiselect>
+
+  <div class="feature-category" data-choice="seo" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">🔎</span>
+      <span class="cat-title">SEO & Structured Data</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Restaurant JSON-LD schema (shows in Google rich results)</li>
+      <li>Menu items as structured data</li>
+      <li>Dynamic Open Graph images per page</li>
+      <li>Sitemap.xml + robots.txt</li>
+      <li>Google My Business deep-link integration</li>
+    </ul>
+  </div>
+
+  <div class="feature-category" data-choice="whatsapp-share" onclick="toggleSelect(this)">
+    <div class="cat-header">
+      <span class="cat-icon">📤</span>
+      <span class="cat-title">Social Sharing</span>
+      <span class="cat-badge">✓ Selected</span>
+    </div>
+    <ul class="feature-list">
+      <li>Share cart / combo to WhatsApp, Instagram, X</li>
+      <li>Shareable menu item links with OG preview image</li>
+      <li>"I just ordered from The Kebab Lab!" post template</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  // Override toggleSelect to support multiple independent grids
+  document.querySelectorAll('.feature-category').forEach(el => {
+    el.addEventListener('click', function() {
+      this.classList.toggle('selected');
+      const choice = this.dataset.choice;
+      // Fire selection event for the harness
+      if (window.__recordSelection) window.__recordSelection(choice, this.classList.contains('selected') ? 'selected' : 'deselected');
+    });
+  });
+</script>
+
+<p class="subtitle" style="margin-top:32px; font-size:13px;">Select as many as you like — click anywhere on a card to toggle it. When you're done, tell me in the terminal which ones you want (or just say "all of them").</p>

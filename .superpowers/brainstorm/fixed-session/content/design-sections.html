@@ -1,0 +1,248 @@
+<h2>Full Design — Pages, Components & Data Flow</h2>
+<p class="subtitle">The complete blueprint for every part of the site. Review each section and confirm in terminal.</p>
+
+<style>
+  .section { margin-bottom: 36px; }
+  .section-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #84cc16;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+
+  /* Route map */
+  .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .route-card {
+    background: #1a2234;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .route-path { font-family: monospace; font-size: 12px; color: #84cc16; font-weight: 700; margin-bottom: 4px; }
+  .route-desc { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+  .route-new { border-color: #84cc16; }
+  .route-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 800;
+    background: #84cc16;
+    color: #0a0f1e;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* Adapter diagram */
+  .adapter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .adapter-box {
+    background: #1a2234;
+    border: 1px solid #2d3f5a;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #cbd5e1;
+    text-align: center;
+    min-width: 120px;
+  }
+  .adapter-real { border-color: #16a34a; color: #86efac; background: #0f1a0f; }
+  .adapter-mock { border-color: #d97706; color: #fcd34d; background: #1a1200; }
+  .adapter-arrow { color: #475569; font-size: 16px; }
+  .adapter-condition { font-size: 11px; color: #64748b; font-style: italic; }
+
+  /* Component tree */
+  .tree { font-family: monospace; font-size: 12px; color: #94a3b8; line-height: 1.8; }
+  .tree .comp { color: #93c5fd; }
+  .tree .new { color: #86efac; }
+  .tree .hook { color: #f9a8d4; }
+  .tree .page { color: #fcd34d; font-weight: 700; }
+
+  /* Flow steps */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .flow-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #84cc16;
+    color: #0a0f1e;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .flow-content { flex: 1; padding-bottom: 16px; border-left: 1px solid #1e293b; margin-left: -25px; padding-left: 38px; }
+  .flow-step:last-child .flow-content { border-left: none; }
+  .flow-title { font-size: 13px; font-weight: 700; color: #f8fafc; margin-bottom: 3px; }
+  .flow-detail { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+  /* Two col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .info-box {
+    background: #1a2234;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .info-box h4 { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0 0 8px; }
+  .info-box ul { margin: 0; padding-left: 16px; }
+  .info-box li { font-size: 12px; color: #94a3b8; margin-bottom: 4px; line-height: 1.5; }
+  .info-box.highlight { border-color: #84cc16; background: #1c2d12; }
+  .info-box.highlight h4 { color: #a3e635; }
+</style>
+
+<!-- SECTION 1: Routes -->
+<div class="section">
+  <div class="section-title">1 — Full Route Map (30 routes total)</div>
+  <div class="route-grid">
+    <div class="route-card"><div class="route-path">/</div><div class="route-desc">Homepage — hero, live open/closed, social proof counter, featured items, categories, how it works, reviews carousel, footer</div></div>
+    <div class="route-card"><div class="route-path">/menu</div><div class="route-desc">Full menu — sticky category sidebar, fuzzy search, dietary filters, item cards with 3D hover, cart summary strip</div></div>
+    <div class="route-card"><div class="route-path">/order</div><div class="route-desc">4-step checkout — type → details → payment → confirmation</div></div>
+    <div class="route-card"><div class="route-path">/order/confirmation/[id]</div><div class="route-desc">Success page with animation, order number, ETA, track button</div></div>
+    <div class="route-card"><div class="route-path">/track/[orderId]</div><div class="route-desc">Realtime status stepper, ETA countdown, order summary</div></div>
+    <div class="route-card"><div class="route-path">/account</div><div class="route-desc">Profile, addresses, order history, favourites tab, loyalty points, referral link</div></div>
+    <div class="route-card"><div class="route-path">/login  /register  /forgot-password</div><div class="route-desc">Auth pages — email/password + Google OAuth</div></div>
+    <div class="route-card route-new"><div class="route-path">/deals <span class="route-badge">NEW</span></div><div class="route-desc">Active flash deals with countdown timers. Links to relevant menu items.</div></div>
+    <div class="route-card route-new"><div class="route-path">/build <span class="route-badge">NEW</span></div><div class="route-desc">Visual combo customizer — pick protein, base, extras, sauces. Real-time price. Save + share.</div></div>
+    <div class="route-card route-new"><div class="route-path">/ref/[code] <span class="route-badge">NEW</span></div><div class="route-desc">Referral landing page — shows referrer name, applies credit automatically on signup</div></div>
+    <div class="route-card"><div class="route-path">/admin</div><div class="route-desc">Dashboard — stats cards, live order queue, revenue chart, popular items</div></div>
+    <div class="route-card"><div class="route-path">/admin/orders  /admin/orders/[id]</div><div class="route-desc">Order management with status workflow buttons</div></div>
+    <div class="route-card"><div class="route-path">/admin/menu  /admin/menu/[id]</div><div class="route-desc">Menu editor — toggle availability, edit prices, upload images</div></div>
+    <div class="route-card route-new"><div class="route-path">/admin/deals <span class="route-badge">NEW</span></div><div class="route-desc">Flash deal creator — set item/category, discount type, start/end time, schedule</div></div>
+    <div class="route-card route-new"><div class="route-path">/admin/loyalty <span class="route-badge">NEW</span></div><div class="route-desc">Points config — earn rate, tier thresholds, manual point adjustments per customer</div></div>
+    <div class="route-card route-new"><div class="route-path">/admin/analytics <span class="route-badge">NEW</span></div><div class="route-desc">Hourly heatmap, category breakdown, AOV trend, promo performance, customer retention</div></div>
+    <div class="route-card route-new"><div class="route-path">/kitchen <span class="route-badge">NEW</span></div><div class="route-desc">KDS — full-screen, colour-coded order cards by age, tap to advance status. PIN protected.</div></div>
+  </div>
+</div>
+
+<!-- SECTION 2: Mock adapter pattern -->
+<div class="section">
+  <div class="section-title">2 — Mock-First Adapter Pattern</div>
+  <p style="font-size:13px;color:#94a3b8;margin-bottom:14px;">Every external service is accessed through an adapter. The adapter checks for env vars at runtime — no env var = mock response. Swap in real keys and the same code goes live. No conditional logic in components.</p>
+  <div class="adapter-row">
+    <div class="adapter-box">Component / API Route</div>
+    <div class="adapter-arrow">→</div>
+    <div class="adapter-box" style="border-color:#7c3aed;color:#c4b5fd;background:#1a1230;">Adapter (e.g. db.getMenu())</div>
+    <div class="adapter-arrow">→</div>
+    <div class="adapter-real adapter-box">Real Supabase<br><span style="font-size:10px">when SUPABASE_URL set</span></div>
+    <div style="color:#475569;font-size:13px">or</div>
+    <div class="adapter-mock adapter-box">Mock JSON<br><span style="font-size:10px">when env var missing</span></div>
+  </div>
+  <div class="adapter-row">
+    <div class="adapter-box" style="opacity:0">spacer</div>
+    <div class="adapter-arrow" style="opacity:0">→</div>
+    <div class="adapter-box" style="border-color:#7c3aed;color:#c4b5fd;background:#1a1230;">stripe.createIntent()</div>
+    <div class="adapter-arrow">→</div>
+    <div class="adapter-real adapter-box">Real Stripe<br><span style="font-size:10px">when STRIPE_KEY set</span></div>
+    <div style="color:#475569;font-size:13px">or</div>
+    <div class="adapter-mock adapter-box">{ clientSecret: "mock_…" }<br><span style="font-size:10px">always succeeds</span></div>
+  </div>
+  <div class="adapter-row">
+    <div class="adapter-box" style="opacity:0">spacer</div>
+    <div class="adapter-arrow" style="opacity:0">→</div>
+    <div class="adapter-box" style="border-color:#7c3aed;color:#c4b5fd;background:#1a1230;">email.sendConfirmation()</div>
+    <div class="adapter-arrow">→</div>
+    <div class="adapter-real adapter-box">Real Resend<br><span style="font-size:10px">when RESEND_KEY set</span></div>
+    <div style="color:#475569;font-size:13px">or</div>
+    <div class="adapter-mock adapter-box">console.log(email)<br><span style="font-size:10px">logs to terminal</span></div>
+  </div>
+</div>
+
+<!-- SECTION 3: Key flows -->
+<div class="section">
+  <div class="section-title">3 — Key Interaction Flows</div>
+  <div class="two-col">
+    <div>
+      <h4 style="font-size:12px;font-weight:700;color:#f8fafc;margin-bottom:12px">🛒 Order + Loyalty Points Flow</h4>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-num">1</div><div class="flow-content"><div class="flow-title">Customer places order</div><div class="flow-detail">Cart → Checkout → Payment confirmed</div></div></div>
+        <div class="flow-step"><div class="flow-num">2</div><div class="flow-content"><div class="flow-title">Points auto-credited</div><div class="flow-detail">DB trigger: 1pt per £1 spent → inserted into loyalty_points. If referral exists, referrer also gets 30pts.</div></div></div>
+        <div class="flow-step"><div class="flow-num">3</div><div class="flow-content"><div class="flow-title">Tier check</div><div class="flow-detail">After insert, function checks total lifetime points → updates profile tier (Regular 0–199, Frequent 200–499, VIP 500+)</div></div></div>
+        <div class="flow-step"><div class="flow-num">4</div><div class="flow-content"><div class="flow-title">Redemption at checkout</div><div class="flow-detail">Customer sees "Use 100 Lab Points (£1.00 off)" toggle. Applied as discount before payment intent is created.</div></div></div>
+        <div class="flow-step"><div class="flow-num">5</div><div class="flow-content"><div class="flow-title">Account dashboard</div><div class="flow-detail">Points balance, tier badge, history of earn/spend events, progress bar to next tier</div></div></div>
+      </div>
+    </div>
+    <div>
+      <h4 style="font-size:12px;font-weight:700;color:#f8fafc;margin-bottom:12px">⚡ Flash Deal Flow</h4>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-num">1</div><div class="flow-content"><div class="flow-title">Admin creates deal</div><div class="flow-detail">/admin/deals → set target (item/category/whole order), discount (% or £), start/end datetime</div></div></div>
+        <div class="flow-step"><div class="flow-num">2</div><div class="flow-content"><div class="flow-title">Deal goes live</div><div class="flow-detail">Banner appears on homepage + /menu automatically. Countdown timer shows. Affected items show crossed-out original price.</div></div></div>
+        <div class="flow-step"><div class="flow-num">3</div><div class="flow-content"><div class="flow-title">Checkout applies discount</div><div class="flow-detail">API validates deal still active on order creation. Applied as line item. Cannot stack with promo codes.</div></div></div>
+        <div class="flow-step"><div class="flow-num">4</div><div class="flow-content"><div class="flow-title">Deal expires</div><div class="flow-detail">Banner disappears. Original prices restored. Scheduled deals auto-start/stop via cron or time check.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: Component architecture -->
+<div class="section">
+  <div class="section-title">4 — Component Architecture (key new components)</div>
+  <div class="two-col">
+    <div class="info-box highlight">
+      <h4>New shared components</h4>
+      <ul>
+        <li><strong>LoyaltyBadge</strong> — tier + points, shown in navbar when logged in</li>
+        <li><strong>FlashDealBanner</strong> — dismissible, sticky below navbar when deal active</li>
+        <li><strong>SocialProofToast</strong> — "X just ordered Y" — fires every 30–90s</li>
+        <li><strong>OrderCounterBadge</strong> — "47 orders today" on homepage hero</li>
+        <li><strong>WhatsAppFAB</strong> — floating action button, bottom-right, all pages</li>
+        <li><strong>MinOrderProgressBar</strong> — in CartDrawer, fills as cart grows toward £12</li>
+        <li><strong>FavouriteButton</strong> — heart icon overlay on MenuCard</li>
+        <li><strong>UpsellPrompt</strong> — modal/sheet on add-to-cart for relevant suggestions</li>
+        <li><strong>ExitIntentModal</strong> — email capture, fires once on exit intent</li>
+        <li><strong>ShareSheet</strong> — native share API + WhatsApp/X/copy fallbacks</li>
+      </ul>
+    </div>
+    <div class="info-box">
+      <h4>New page-level components</h4>
+      <ul>
+        <li><strong>ComboBuilder</strong> — drag/select protein, base, 3 extras, sauce. Price reactive. Save to account or share.</li>
+        <li><strong>KitchenBoard</strong> — grid of OrderTicket cards. Red border &gt;15min, amber &gt;8min, green fresh. Realtime.</li>
+        <li><strong>LoyaltyDashboard</strong> — points graph, tier progress, earn history table</li>
+        <li><strong>ReferralPanel</strong> — unique link, copy + share, referral count, pending/paid credits</li>
+        <li><strong>AnalyticsHeatmap</strong> — hour × day grid coloured by order volume</li>
+        <li><strong>DealCreator</strong> — form with live preview of how the deal appears on the menu</li>
+        <li><strong>ReviewCarousel</strong> — autoplay, pause on hover, star ratings, photo thumbnails</li>
+        <li><strong>PWAInstallPrompt</strong> — bottom sheet on mobile after 3rd visit</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: New API routes -->
+<div class="section">
+  <div class="section-title">5 — New API Routes (beyond base spec)</div>
+  <div class="route-grid">
+    <div class="route-card route-new"><div class="route-path">GET /api/loyalty/balance</div><div class="route-desc">Returns current user's points, tier, and earn history</div></div>
+    <div class="route-card route-new"><div class="route-path">POST /api/loyalty/redeem</div><div class="route-desc">Validates and reserves points for use in an order</div></div>
+    <div class="route-card route-new"><div class="route-path">GET /api/referral/link</div><div class="route-desc">Returns or creates the user's unique referral code + link</div></div>
+    <div class="route-card route-new"><div class="route-path">POST /api/referral/apply</div><div class="route-desc">Validates referral code on registration, credits both parties</div></div>
+    <div class="route-card route-new"><div class="route-path">GET /api/deals</div><div class="route-desc">Returns currently active flash deals (public)</div></div>
+    <div class="route-card route-new"><div class="route-path">POST /api/admin/deals</div><div class="route-desc">Create/update/delete flash deals (admin only)</div></div>
+    <div class="route-card route-new"><div class="route-path">POST /api/favourites/toggle</div><div class="route-desc">Add or remove a menu item from favourites</div></div>
+    <div class="route-card route-new"><div class="route-path">GET /api/favourites</div><div class="route-desc">Returns user's saved favourite items with full menu data</div></div>
+    <div class="route-card route-new"><div class="route-path">POST /api/subscribe</div><div class="route-desc">Email capture — validates email, inserts to email_subscribers, triggers welcome email</div></div>
+    <div class="route-card route-new"><div class="route-path">GET /api/social-proof</div><div class="route-desc">Returns today's order count, trending items. Cached 60s.</div></div>
+    <div class="route-card route-new"><div class="route-path">GET /api/wait-time</div><div class="route-desc">Returns current estimated wait (delivery + collection) based on admin's queue setting</div></div>
+    <div class="route-card route-new"><div class="route-path">POST /api/admin/wait-time</div><div class="route-desc">Admin sets queue load level: quiet / normal / busy</div></div>
+    <div class="route-card route-new"><div class="route-path">GET /api/admin/analytics/heatmap</div><div class="route-desc">Hour × day order volume for last 4 weeks</div></div>
+    <div class="route-card route-new"><div class="route-path">POST /api/push/subscribe</div><div class="route-desc">Saves PWA push subscription for a user</div></div>
+    <div class="route-card route-new"><div class="route-path">GET /sitemap.xml  GET /robots.txt</div><div class="route-desc">SEO files — sitemap includes all menu item pages</div></div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:28px;font-size:13px;">That's the full design. Does everything look right? Say "approved" in the terminal and I'll write the spec doc and move to the implementation plan.</p>

@@ -1,0 +1,36 @@
+export const BRAND = {
+  name: 'The Kebab Lab',
+  tagline: 'Find Your Perfect Formula',
+  sub: 'Clay Oven Specialist',
+  phone: '01282 454 626',
+  phoneRaw: '01282454626',
+  address: '123 Colne Road, Burnley, BB10 1LN',
+  city: 'Burnley',
+  postcode: 'BB10 1LN',
+  email: 'hello@thekebablabonline.co.uk',
+  website: 'www.thekebablabonline.co.uk',
+  coordinates: { lat: 53.789, lng: -2.247 },
+  delivery: {
+    fee: 2.49,
+    minimumOrder: 12,
+    freeOver: 25,
+    radiusMiles: 3,
+    estimatedMins: '30-45',
+  },
+  collection: {
+    estimatedMins: '15-20',
+  },
+  hours: [
+    { day: 'Sunday',    open: '4:00 PM', close: '12:40 AM', isOpen: true },
+    { day: 'Monday',    open: '4:00 PM', close: '12:40 AM', isOpen: true },
+    { day: 'Tuesday',   open: null,      close: null,       isOpen: false },
+    { day: 'Wednesday', open: '4:00 PM', close: '12:40 AM', isOpen: true },
+    { day: 'Thursday',  open: '4:00 PM', close: '12:40 AM', isOpen: true },
+    { day: 'Friday',    open: '4:00 PM', close: '12:40 AM', isOpen: true },
+    { day: 'Saturday',  open: '4:00 PM', close: '12:40 AM', isOpen: true },
+  ],
+  social: {
+    instagram: 'https://instagram.com/thekebablab',
+    facebook: 'https://facebook.com/thekebablab',
+  },
+} as const

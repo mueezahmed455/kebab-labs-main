@@ -1,0 +1,27 @@
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+
+[db]
+major_version = 15
+
+[db.pooler]
+enabled = true
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://thekebablabonline.co.uk/**"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_confirmations = false
+enable_autoconfirm = true
+
+[storage]
+enabled = true
+
+[realtime]
+enabled = true
