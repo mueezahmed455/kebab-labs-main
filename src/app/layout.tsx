@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Bebas_Neue, Plus_Jakarta_Sans } from 'next/font/google'
+import { Playfair_Display, Inter } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -8,16 +8,15 @@ import { ThemeProvider } from '@/lib/theme-provider'
 import { Toaster } from 'sonner'
 import { BRAND } from '@/lib/data/brand'
 
-const bebasNeue = Bebas_Neue({
-  weight: '400',
+const playfair = Playfair_Display({
   subsets: ['latin'],
-  variable: '--font-bebas',
+  variable: '--font-playfair',
   display: 'swap',
 })
 
-const plusJakarta = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-jakarta',
+  variable: '--font-inter',
   display: 'swap',
 })
 
@@ -95,13 +94,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <html lang="en" className={`${bebasNeue.variable} ${plusJakarta.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <head>
         <script type="application/ld+json" suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
         />
       </head>
       <body>
+        <div className="grain-overlay" aria-hidden="true" />
         <ThemeProvider>
           <Navbar />
           <main>{children}</main>

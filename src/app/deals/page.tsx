@@ -74,7 +74,7 @@ export default function DealsPage() {
             className="text-center mb-12"
           >
             <p className="text-brand-green text-sm font-medium tracking-widest uppercase mb-2">Best Value</p>
-            <h1 className="font-display text-5xl md:text-7xl text-brand-text tracking-wider mb-4">DEALS & PLATTERS</h1>
+            <h1 className="font-display italic text-5xl md:text-7xl text-brand-text tracking-tight leading-[0.9] mb-4">Deals &amp; Platters</h1>
             <p className="text-brand-muted text-lg max-w-lg mx-auto">
               Unbeatable combinations designed to feed your appetite without emptying your wallet.
             </p>
@@ -93,7 +93,7 @@ export default function DealsPage() {
                     <deal.icon className="w-5 h-5 text-brand-green" />
                   </div>
                   <div>
-                    <h2 className="font-display text-2xl md:text-3xl text-brand-text tracking-wider">{deal.title}</h2>
+                    <h2 className="font-display italic text-2xl md:text-3xl text-brand-text tracking-tight">{deal.title}</h2>
                     {deal.sub && <p className="text-brand-dim text-sm">{deal.sub}</p>}
                   </div>
                 </div>
@@ -112,7 +112,7 @@ export default function DealsPage() {
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                           {item.desc && item.desc.length > 0 && <span className="hidden md:block text-brand-dim text-xs text-right max-w-[200px]">{item.desc}</span>}
-                          <span className="font-display text-lg text-brand-green">{item.price}</span>
+                          <span className="font-display italic text-lg text-brand-green">{item.price}</span>
                         </div>
                       </div>
                     ))}

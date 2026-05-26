@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingCart, FlaskConical, Menu, X, Moon, Sun } from 'lucide-react'
+import { ShoppingCart, Menu, X, Moon, Sun, ShieldCheck } from 'lucide-react'
+import { KebabLabLogo } from '@/components/ui/KebabLabLogo'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/lib/store/cartStore'
 import { isOpenNow } from '@/lib/utils/isOpen'
@@ -12,8 +13,8 @@ import { cn } from '@/lib/utils'
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/menu', label: 'Menu' },
-  { href: '/deals', label: 'Deals' },
-  { href: '/about', label: 'About' },
+  { href: '/deals', label: 'Offers' },
+  { href: '/about', label: 'Our Story' },
 ]
 
 export function Navbar() {
@@ -32,7 +33,7 @@ export function Navbar() {
   }, [])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10)
+    const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -43,120 +44,104 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50',
-          scrolled ? 'glass-nav shadow-lg shadow-brand-shadow' : 'glass-nav'
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+          scrolled
+            ? 'glass-nav py-3'
+            : 'bg-transparent py-6'
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-18">
+          <div className="flex items-center justify-between h-12 md:h-14">
+            
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
-                <motion.div
-                  whileHover={{ rotate: -15 }}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-brand-gold/20 to-brand-green/10 border border-brand-gold/30 group-hover:border-brand-green/40 transition-colors"
-                >
-                  <FlaskConical className="w-5 h-5 text-brand-gold" />
-                </motion.div>
-              <div>
-                  <div className="font-display text-xl leading-none text-brand-text tracking-wider">
-                    THE KEBAB LAB
-                  </div>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <div className="text-[10px] text-brand-green leading-none tracking-widest uppercase font-semibold">
-                      Clay Oven Specialist
-                    </div>
-                    <span className="w-1 h-1 rounded-full bg-brand-gold" />
-                    <div className="text-[9px] text-brand-gold leading-none tracking-widest uppercase font-medium">
-                      Burnley
-                    </div>
-                  </div>
+            <Link href="/" className="flex items-center group" aria-label="The Kebab Lab – Home">
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+              >
+                <div className="sm:hidden">
+                  <KebabLabLogo size={42} showWordmark={false} />
                 </div>
+                <div className="hidden sm:block">
+                  <KebabLabLogo size={42} showWordmark={true} />
+                </div>
+              </motion.div>
             </Link>
 
-            {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
+            {/* Desktop Nav */}
+            <nav className="hidden lg:flex items-center gap-10" aria-label="Main navigation">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    'relative text-sm font-medium transition-colors hover:text-brand-text',
-                    pathname === link.href ? 'text-brand-text' : 'text-brand-muted'
+                    'relative text-[13px] font-medium tracking-wide transition-colors',
+                    pathname === link.href ? 'text-brand-gold' : 'text-brand-muted hover:text-brand-text'
                   )}
                 >
                   {link.label}
                   {pathname === link.href && (
                     <motion.span
                       layoutId="nav-active"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-brand-gold"
+                      className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-5 h-[2px] rounded-full bg-brand-gold"
                     />
                   )}
                 </Link>
               ))}
             </nav>
 
-            {/* Right side */}
-            <div className="flex items-center gap-2">
-              {/* Theme toggle */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={toggleTheme}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-surface border border-brand-border hover:border-brand-gold/30 transition-colors"
-                  aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                >
-                  <AnimatePresence mode="wait">
-                    {theme === 'dark' ? (
-                      <motion.span
-                        key="sun"
-                        initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-                        animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                        exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-                        transition={{ duration: 0.25 }}
-                      >
-                        <Sun className="w-4 h-4 text-brand-gold" />
-                      </motion.span>
-                    ) : (
-                      <motion.span
-                        key="moon"
-                        initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
-                        animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                        exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
-                        transition={{ duration: 0.25 }}
-                      >
-                        <Moon className="w-4 h-4 text-brand-gold" />
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </motion.button>
-
-              {/* Open/closed badge */}
+            {/* Actions */}
+            <div className="flex items-center gap-2.5">
+              
+              {/* Status */}
               <motion.div
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.03 }}
                 className={cn(
-                  'hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border',
+                  'hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border text-[10px] font-semibold uppercase tracking-wider transition-colors',
                   open
-                    ? 'bg-brand-green/10 text-brand-green border-brand-green/30'
-                    : 'bg-red-900/20 text-red-400 border-red-700/30'
+                    ? 'border-brand-green/20 text-brand-green'
+                    : 'border-red-500/20 text-red-400'
                 )}
               >
-                <motion.span
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                  className={cn('w-1.5 h-1.5 rounded-full', open ? 'bg-brand-green' : 'bg-red-400')}
-                />
-                {open ? 'Open Now' : 'Closed'}
+                <span className={cn(
+                  'w-1.5 h-1.5 rounded-full',
+                  open ? 'bg-brand-green animate-pulse' : 'bg-red-400'
+                )} />
+                {open ? 'Accepting Orders' : 'Closed'}
               </motion.div>
 
-              {/* Cart button */}
+              <div className="h-6 w-[1px] bg-brand-border/50 hidden md:block" />
+
+              {/* Theme Toggle */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={toggleTheme}
+                className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-surface/50 border border-brand-border hover:border-brand-gold/20 transition-colors"
+                aria-label="Toggle Theme"
+              >
+                <AnimatePresence mode="wait">
+                  {theme === 'dark' ? (
+                    <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+                      <Sun className="w-4 h-4 text-brand-gold" />
+                    </motion.div>
+                  ) : (
+                    <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
+                      <Moon className="w-4 h-4 text-brand-gold" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+
+              {/* Cart */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setCartOpen(true)}
-                className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-brand-green/10 border border-brand-green/30 hover:bg-brand-green/20 transition-colors"
+                className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-brand-green/10 border border-brand-green/20 hover:bg-brand-green/20 transition-colors"
                 aria-label={`Cart, ${count} items`}
               >
-                <ShoppingCart className="w-5 h-5 text-brand-green" />
+                <ShoppingCart className="w-4 h-4 text-brand-green" />
                 <AnimatePresence>
                   {count > 0 && (
                     <motion.span
@@ -164,21 +149,20 @@ export function Navbar() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-brand-gold text-brand-bg text-[11px] font-bold flex items-center justify-center"
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-brand-gold text-brand-bg text-[9px] font-bold flex items-center justify-center"
                     >
-                      {count > 9 ? '9+' : count}
+                      {count}
                     </motion.span>
                   )}
                 </AnimatePresence>
               </motion.button>
 
-              {/* Mobile hamburger */}
+              {/* Mobile menu trigger */}
               <button
                 onClick={() => setMobileOpen((v) => !v)}
-                className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-brand-surface border border-brand-border hover:border-brand-green/30 transition-colors"
-                aria-label="Toggle menu"
+                className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-brand-surface border border-brand-border hover:border-brand-gold/20 transition-colors"
               >
-                {mobileOpen ? <X className="w-5 h-5 text-brand-text" /> : <Menu className="w-5 h-5 text-brand-text" />}
+                {mobileOpen ? <X className="w-4 h-4 text-brand-text" /> : <Menu className="w-4 h-4 text-brand-text" />}
               </button>
             </div>
           </div>
@@ -194,50 +178,52 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-black/80 backdrop-blur-xl lg:hidden"
             />
             <motion.nav
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-brand-surface border-l border-brand-border md:hidden flex flex-col pt-20 px-6 gap-2"
-              aria-label="Mobile navigation"
+              transition={{ type: 'spring', damping: 35, stiffness: 300 }}
+              className="fixed top-0 right-0 bottom-0 z-50 w-80 bg-brand-bg border-l border-brand-border lg:hidden flex flex-col pt-24 px-8 gap-4"
             >
+              <div className="mb-8">
+                <p className="text-brand-gold text-[10px] font-semibold uppercase tracking-[0.25em] mb-2">Navigation</p>
+                <div className="h-[1px] w-10 bg-brand-gold/30" />
+              </div>
+
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    'flex items-center py-3 text-base font-medium border-b border-brand-border transition-colors',
-                    pathname === link.href ? 'text-brand-green' : 'text-brand-muted hover:text-brand-text'
+                    'flex items-center py-4 text-2xl font-display italic tracking-wide transition-colors',
+                    pathname === link.href ? 'text-brand-gold' : 'text-brand-text hover:text-brand-gold'
                   )}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-6 flex flex-col gap-3">
+              
+              <div className="mt-auto mb-12 flex flex-col gap-4">
                 <Link
                   href="/menu"
-                  className="flex items-center justify-center w-full py-3 rounded-xl bg-brand-green text-brand-dark font-bold text-sm hover:bg-brand-green-dark transition-colors"
+                  className="flex items-center justify-center w-full py-4 rounded-2xl bg-brand-fire text-white font-medium text-sm shadow-lg"
                 >
                   Order Now
                 </Link>
-                <button
-                  onClick={toggleTheme}
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-brand-border text-brand-muted text-sm hover:text-brand-text transition-colors"
-                >
-                  {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                </button>
+                <div className="flex items-center justify-center gap-3 text-brand-dim">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span className="text-[10px] font-semibold uppercase tracking-wider">Premium Quality Assured</span>
+                </div>
               </div>
             </motion.nav>
           </>
         )}
       </AnimatePresence>
 
-      {/* Spacer for fixed navbar */}
-      <div className="h-16 md:h-18" />
+      {/* Spacer */}
+      <div className={cn('transition-all duration-500', scrolled ? 'h-20' : 'h-24')} />
     </>
   )
 }

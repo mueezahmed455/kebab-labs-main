@@ -234,7 +234,7 @@ const STATUS_META: Record<string, { icon: string; color: string; title: string }
   ready: { icon: '📦', color: '#a3e635', title: 'Ready for Collection' },
   out_for_delivery: { icon: '🚚', color: '#d4a54a', title: 'Out for Delivery' },
   delivered: { icon: '🎉', color: '#a3e635', title: 'Delivered!' },
-  cancelled: { icon: '❌', color: '#ef4444', title: 'Cancelled' },
+  cancelled: { icon: '❌', color: '#b81c1c', title: 'Cancelled' },
 }
 
 export function orderStatusHtml(params: {

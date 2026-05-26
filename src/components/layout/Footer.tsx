@@ -1,8 +1,10 @@
 'use client'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { FlaskConical, Phone, MapPin, Clock, Share2, Globe } from 'lucide-react'
+import { Phone, MapPin, Clock, Share2, Globe } from 'lucide-react'
+import { KebabLabLogo } from '@/components/ui/KebabLabLogo'
 import { BRAND } from '@/lib/data/brand'
+import { HalalStamp } from '@/components/ui/HalalStamp'
 
 const HOURS_DISPLAY = [
   { day: 'Monday',    time: '4:00 PM – 12:40 AM' },
@@ -36,43 +38,45 @@ export function Footer() {
         >
           {/* Brand */}
           <motion.div variants={fadeUp} className="lg:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand-green/10 border border-brand-green/30">
-                <FlaskConical className="w-5 h-5 text-brand-green" />
-              </div>
+            <div className="mb-5">
+              <KebabLabLogo size={44} showWordmark={true} />
+            </div>
+
+            <p className="text-brand-muted text-sm leading-relaxed mb-5 max-w-xs">
+              Where fire meets flavour. Handcrafted kebabs, stone-baked pizzas &amp; fresh shawarma in Burnley.
+            </p>
+
+            {/* Halal stamp */}
+            <div className="flex items-center gap-4 mb-5 py-4 px-4 rounded-xl"
+              style={{ background: 'rgba(15,155,94,0.06)', border: '1px solid rgba(15,155,94,0.15)' }}>
+              <HalalStamp size={72} className="flex-shrink-0" />
               <div>
-                <div className="font-display text-lg leading-none text-brand-text tracking-wider">THE KEBAB LAB</div>
-                <div className="text-[10px] text-brand-green leading-none tracking-widest uppercase">Clay Oven Specialist</div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] mb-1 text-brand-green-light">
+                  Halal Certified
+                </p>
+                <p className="text-[10px] text-brand-muted leading-snug">
+                  All meats sourced from certified halal suppliers
+                </p>
               </div>
             </div>
-            <p className="text-brand-muted text-sm leading-relaxed mb-4">
-              Where fire meets flavour. Handcrafted kebabs, stone-baked pizzas & fresh shawarma in Burnley.
-            </p>
+
             <div className="flex gap-3">
-              <a
-                href={BRAND.social.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
+              <a href={BRAND.social.instagram} target="_blank" rel="noopener noreferrer"
                 aria-label="Follow on Instagram"
-                className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand-card border border-brand-border hover:border-brand-green/30 transition-colors"
-              >
-                <Share2 className="w-4 h-4 text-brand-muted hover:text-brand-green" />
+                className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand-card border border-brand-border hover:border-brand-gold/30 transition-colors">
+                <Share2 className="w-4 h-4 text-brand-muted hover:text-brand-gold" />
               </a>
-              <a
-                href={BRAND.social.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
+              <a href={BRAND.social.facebook} target="_blank" rel="noopener noreferrer"
                 aria-label="Follow on Facebook"
-                className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand-card border border-brand-border hover:border-brand-green/30 transition-colors"
-              >
-                <Globe className="w-4 h-4 text-brand-muted hover:text-brand-green" />
+                className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand-card border border-brand-border hover:border-brand-gold/30 transition-colors">
+                <Globe className="w-4 h-4 text-brand-muted hover:text-brand-gold" />
               </a>
             </div>
           </motion.div>
 
           {/* Quick links */}
           <motion.div variants={fadeUp}>
-            <h3 className="font-display text-lg tracking-wider text-brand-text mb-4">Quick Links</h3>
+            <h3 className="font-display italic text-lg tracking-wide text-brand-text mb-4">Quick Links</h3>
             <ul className="space-y-2">
               {[
                 { href: '/', label: 'Home' },
@@ -83,7 +87,7 @@ export function Footer() {
                 { href: '/menu#sharing', label: 'Sharing Platters' },
               ].map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-brand-muted text-sm hover:text-brand-green transition-colors">
+                  <Link href={link.href} className="text-brand-muted text-sm hover:text-brand-gold transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -93,8 +97,8 @@ export function Footer() {
 
           {/* Opening hours */}
           <motion.div variants={fadeUp}>
-            <h3 className="font-display text-lg tracking-wider text-brand-text mb-4 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-brand-green" />
+            <h3 className="font-display italic text-lg tracking-wide text-brand-text mb-4 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-brand-gold" />
               Opening Hours
             </h3>
             <ul className="space-y-1.5">
@@ -109,15 +113,15 @@ export function Footer() {
 
           {/* Contact */}
           <motion.div variants={fadeUp}>
-            <h3 className="font-display text-lg tracking-wider text-brand-text mb-4">Contact Us</h3>
+            <h3 className="font-display italic text-lg tracking-wide text-brand-text mb-4">Contact Us</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-brand-green mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-brand-gold mt-0.5 flex-shrink-0" />
                 <span className="text-brand-muted text-sm">{BRAND.address}</span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-brand-green flex-shrink-0" />
-                <a href={`tel:${BRAND.phoneRaw}`} className="text-brand-muted text-sm hover:text-brand-green transition-colors">
+                <Phone className="w-4 h-4 text-brand-gold flex-shrink-0" />
+                <a href={`tel:${BRAND.phoneRaw}`} className="text-brand-muted text-sm hover:text-brand-gold transition-colors">
                   {BRAND.phone}
                 </a>
               </li>
@@ -125,9 +129,9 @@ export function Footer() {
             <div className="mt-6">
               <Link
                 href="/menu"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-brand-green text-brand-dark font-semibold text-sm hover:bg-brand-green-dark transition-colors"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-brand-fire text-white font-medium text-sm hover:bg-brand-fire-dark transition-colors"
               >
-                Order Now →
+                Order Now &rarr;
               </Link>
             </div>
           </motion.div>

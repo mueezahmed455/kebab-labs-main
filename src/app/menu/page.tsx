@@ -10,13 +10,20 @@ import { ItemModal } from '@/components/menu/ItemModal'
 import { PageTransition } from '@/components/common/PageTransition'
 
 const container = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.05 } },
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: { staggerChildren: 0.05 } 
+  },
 }
 
 const itemAnim = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }
+  },
 }
 
 export default function MenuPage() {
@@ -44,17 +51,21 @@ export default function MenuPage() {
 
   return (
     <PageTransition>
-      <div className="relative">
+      <div className="relative min-h-screen bg-brand-bg">
         {/* Page header */}
-        <div className="pt-8 pb-4 bg-brand-bg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="pt-24 pb-12 relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(201,149,58,0.04),transparent_70%)]" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className="text-center"
             >
-              <p className="text-brand-green text-sm font-medium tracking-widest uppercase mb-2">Order Online</p>
-              <h1 className="font-display text-4xl md:text-6xl text-brand-text tracking-wider">THE MENU</h1>
+              <p className="text-brand-gold text-[10px] font-semibold uppercase mb-4 tracking-[0.4em]">The Laboratory</p>
+              <h1 className="font-display italic text-6xl md:text-8xl text-brand-text tracking-tight leading-none">
+                Our <span className="text-gradient-gold">Menu</span>
+              </h1>
             </motion.div>
           </div>
         </div>
@@ -65,19 +76,19 @@ export default function MenuPage() {
           onSearchChange={setSearch}
         />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
           {isSearching ? (
-            <div>
-              <p className="text-brand-muted text-sm mb-6">
+            <div className="min-h-[400px]">
+              <p className="text-brand-muted text-sm mb-8 font-medium">
                 {filteredItems.length > 0
-                  ? `${filteredItems.length} result${filteredItems.length !== 1 ? 's' : ''} for "${search}"`
-                  : `No results for "${search}"`}
+                  ? `${filteredItems.length} precision results for "${search}"`
+                  : `No matches found for "${search}"`}
               </p>
               <motion.div
                 variants={container}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
               >
                 {filteredItems.map((item) => {
                   const cat = CATEGORIES.find((c) => c.id === item.cat)!

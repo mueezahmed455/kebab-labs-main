@@ -1,35 +1,35 @@
 import type { Category, MenuItem } from '@/types/menu'
 
 export const CATEGORIES: Category[] = [
-  { id: 'kebabs',   name: 'Kebabs',           icon: '🥙', accentColor: '#ea580c', description: 'Served with naan/chips or wrap, fresh salad & sauce' },
-  { id: 'shawarma', name: 'Shawarma',          icon: '🌯', accentColor: '#9333ea', description: 'Slow-roasted meats infused with secret sauces' },
-  { id: 'donner',   name: 'Donner',            icon: '🍖', accentColor: '#dc2626', description: 'Classic seasoned donner, various combos' },
-  { id: 'combos',   name: 'Mixed Combos',      icon: '🔥', accentColor: '#d97706', description: 'Two proteins, one extraordinary plate' },
-  { id: 'deals',    name: 'Meal Deals',        icon: '🎉', accentColor: '#16a34a', description: 'Great value combinations with chips & drink' },
-  { id: 'burgers',  name: 'Burgers',           icon: '🍔', accentColor: '#ca8a04', description: 'Served with chips, fresh salad & sauce' },
-  { id: 'pizza',    name: 'Pizza',             icon: '🍕', accentColor: '#e11d48', description: 'Stone-baked, available 10" to 16"' },
+  { id: 'kebabs',   name: 'Kebabs',           icon: '🥙', accentColor: '#c94d15', description: 'Served with naan/chips or wrap, fresh salad & sauce' },
+  { id: 'shawarma', name: 'Shawarma',          icon: '🌯', accentColor: '#7c3aed', description: 'Slow-roasted meats infused with secret sauces' },
+  { id: 'donner',   name: 'Donner',            icon: '🍖', accentColor: '#b81c1c', description: 'Classic seasoned donner, various combos' },
+  { id: 'combos',   name: 'Mixed Combos',      icon: '🔥', accentColor: '#c9953a', description: 'Two proteins, one extraordinary plate' },
+  { id: 'deals',    name: 'Meal Deals',        icon: '🎉', accentColor: '#0f9b5e', description: 'Great value combinations with chips & drink' },
+  { id: 'burgers',  name: 'Burgers',           icon: '🍔', accentColor: '#b07a28', description: 'Served with chips, fresh salad & sauce' },
+  { id: 'pizza',    name: 'Pizza',             icon: '🍕', accentColor: '#d94f0a', description: 'Stone-baked, available 10" to 16"' },
   { id: 'sharing',  name: 'Sharing Platters',  icon: '🤝', accentColor: '#0891b2', description: 'Perfect for groups, loaded with the best' },
-  { id: 'extras',   name: 'Sides & Extras',    icon: '🍟', accentColor: '#b45309', description: 'Chips, dips, garlic bread and more' },
+  { id: 'extras',   name: 'Sides & Extras',    icon: '🍟', accentColor: '#a83c0a', description: 'Chips, dips, garlic bread and more' },
   { id: 'drinks',   name: 'Drinks & Dessert',  icon: '🥤', accentColor: '#1d4ed8', description: 'Cold drinks and Ben & Jerry\'s ice cream' },
 ]
 
 export const MENU_ITEMS: MenuItem[] = [
   // ── KEBABS ──────────────────────────────────────────────────────────────
-  { id: 'k1', cat: 'kebabs', name: 'Single Kobeda',       desc: 'Hand-crafted minced beef with our signature Middle Eastern spice blend, flame-grilled over fiery clay oven coals.',    price: 6.99,  badge: "Chef's Pick", image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=600&auto=format&fit=crop&q=80' },
-  { id: 'k2', cat: 'kebabs', name: 'Double Kobeda',       desc: 'Double the signature kobeda for serious kebab lovers. Our most popular indulgence.',                                    price: 12.99, image: 'https://images.unsplash.com/photo-1633321702518-7feccafb94d5?w=600&auto=format&fit=crop&q=80' },
-  { id: 'k3', cat: 'kebabs', name: 'Cheesy Kobeda Bites', desc: 'Tender minced beef with melted marmur cheese, spiced and charcoal-cooked to perfection.',                              price: 7.99,  badge: 'Popular', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80' },
-  { id: 'k4', cat: 'kebabs', name: 'Chicken Tikka',       desc: 'Lean chicken breast marinated in our secret sauce, skewered and cooked over charcoal.',                                price: 6.99,  image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600&auto=format&fit=crop&q=80' },
-  { id: 'k5', cat: 'kebabs', name: 'Double Chicken Tikka',desc: 'Double portion of our legendary charcoal-cooked chicken tikka.',                                                        price: 12.99, badge: 'Best Value', image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600&auto=format&fit=crop&q=80' },
-  { id: 'k6', cat: 'kebabs', name: 'Chicken Wings (5pc)', desc: 'Five juicy wings marinated in our secret sauce, charcoal-cooked until perfectly crisp.',                               price: 5.99,  image: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=600&auto=format&fit=crop&q=80' },
+  { id: 'k1', cat: 'kebabs', name: 'Single Kobeda',       desc: 'Hand-crafted minced beef with our signature Middle Eastern spice blend, flame-grilled over fiery clay oven coals.',    price: 6.99,  badge: "Chef's Pick", image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&auto=format&fit=crop&q=90' },
+  { id: 'k2', cat: 'kebabs', name: 'Double Kobeda',       desc: 'Double the signature kobeda for serious kebab lovers. Our most popular indulgence.',                                    price: 12.99, image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=90' },
+  { id: 'k3', cat: 'kebabs', name: 'Cheesy Kobeda Bites', desc: 'Tender minced beef with melted marmur cheese, spiced and charcoal-cooked to perfection.',                              price: 7.99,  badge: 'Popular', image: 'https://images.unsplash.com/photo-1633321702518-7feccafb94d5?w=800&auto=format&fit=crop&q=90' },
+  { id: 'k4', cat: 'kebabs', name: 'Chicken Tikka',       desc: 'Lean chicken breast marinated in our secret sauce, skewered and cooked over charcoal.',                                price: 6.99,  image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=800&auto=format&fit=crop&q=90' },
+  { id: 'k5', cat: 'kebabs', name: 'Double Chicken Tikka',desc: 'Double portion of our legendary charcoal-cooked chicken tikka.',                                                        price: 12.99, badge: 'Best Value', image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=800&auto=format&fit=crop&q=90' },
+  { id: 'k6', cat: 'kebabs', name: 'Chicken Wings (5pc)', desc: 'Five juicy wings marinated in our secret sauce, charcoal-cooked until perfectly crisp.',                               price: 5.99,  image: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=800&auto=format&fit=crop&q=90' },
   { id: 'k7', cat: 'kebabs', name: 'Veg Kebab',           desc: 'Lightly spiced potato blended with caramelised onions and dried herbs, authentic Middle Eastern taste.',               price: 5.49,  vegetarian: true },
 
   // ── SHAWARMA ────────────────────────────────────────────────────────────
-  { id: 's1', cat: 'shawarma', name: 'Chicken Shawarma',    desc: 'Succulent chicken grilled and infused with our closely guarded secret sauce, wrapped to perfection.',               price: 7.49,  image: 'https://images.unsplash.com/photo-1530469912745-a215c6b256ea?w=600&auto=format&fit=crop&q=80' },
-  { id: 's2', cat: 'shawarma', name: 'Lamb Shawarma',       desc: 'Slow-roasted lamb layered on a giant skewer, cooked until it falls apart with flavour.',                           price: 8.99,  badge: 'Premium', image: 'https://images.unsplash.com/photo-1662116765994-1e4200c43589?w=600&auto=format&fit=crop&q=80' },
-  { id: 's3', cat: 'shawarma', name: 'Lamb & Chicken Mix',  desc: "Can't decide? Our signature mix of both in one unforgettable wrap.",                                               price: 9.99,  badge: 'Popular', image: 'https://images.unsplash.com/photo-1561620141-343a829938de?w=600&auto=format&fit=crop&q=80' },
+  { id: 's1', cat: 'shawarma', name: 'Chicken Shawarma',    desc: 'Succulent chicken grilled and infused with our closely guarded secret sauce, wrapped to perfection.',               price: 7.49,  image: 'https://images.unsplash.com/photo-1530469912745-a215c6b256ea?w=800&auto=format&fit=crop&q=90' },
+  { id: 's2', cat: 'shawarma', name: 'Lamb Shawarma',       desc: 'Slow-roasted lamb layered on a giant skewer, cooked until it falls apart with flavour.',                           price: 8.99,  badge: 'Premium', image: 'https://images.unsplash.com/photo-1662116765994-1e4200c43589?w=800&auto=format&fit=crop&q=90' },
+  { id: 's3', cat: 'shawarma', name: 'Lamb & Chicken Mix',  desc: "Can't decide? Our signature mix of both in one unforgettable wrap.",                                               price: 9.99,  badge: 'Popular', image: 'https://images.unsplash.com/photo-1561620141-343a829938de?w=800&auto=format&fit=crop&q=90' },
 
   // ── DONNER ──────────────────────────────────────────────────────────────
-  { id: 'd1', cat: 'donner', name: 'Donner Kebab',              desc: 'Classic seasoned donner with fresh salad and your choice of house sauce.',                                     price: 6.99,  image: 'https://images.unsplash.com/photo-1583060095186-852adde6b819?w=600&auto=format&fit=crop&q=80' },
+  { id: 'd1', cat: 'donner', name: 'Donner Kebab',              desc: 'Classic seasoned donner with fresh salad and your choice of house sauce.',                                     price: 6.99,  image: 'https://images.unsplash.com/photo-1583060095186-852adde6b819?w=800&auto=format&fit=crop&q=90' },
   { id: 'd2', cat: 'donner', name: 'Large Donner',              desc: "A generous, loaded portion of our classic donner. For when regular just won't do.",                           price: 9.49,  image: 'https://images.unsplash.com/photo-1583060095186-852adde6b819?w=600&auto=format&fit=crop&q=80' },
   { id: 'd3', cat: 'donner', name: 'Tray Donner',               desc: 'Donner served in a tray — great for sharing or extra-hungry appetites.',                                      price: 5.49 },
   { id: 'd4', cat: 'donner', name: 'Donner & Chicken Tikka',    desc: 'The ultimate two-protein combo — rich donner meets charcoal chicken tikka.',                                  price: 10.99, badge: 'Popular' },
@@ -114,4 +114,4 @@ export const MENU_ITEMS: MenuItem[] = [
   { id: 'dr5', cat: 'drinks', name: "Ben & Jerry's Ice Cream",  desc: 'Caramel Chew Chew · Chocolate Fudge · Strawberry Cheesecake · Cookie Dough', price: 3.49, badge: 'Dessert' },
 ]
 
-export const POPULAR_ITEM_IDS = ['k1', 's2', 's3', 'p10', 'sp4', 'm1']
+export const POPULAR_ITEM_IDS = ['k1', 's2', 'p10', 'b1', 'sp4', 's3']

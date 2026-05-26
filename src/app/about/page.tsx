@@ -48,9 +48,10 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="font-display text-5xl md:text-7xl text-brand-text tracking-wider mb-6"
+            className="font-display italic text-5xl md:text-7xl text-brand-text tracking-tight mb-6 leading-[0.9]"
           >
-            THE SCIENCE<br />OF FLAVOUR
+            The Science<br />
+            <span className="text-gradient-fire">of Flavour</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -72,7 +73,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="font-display text-4xl md:text-5xl text-brand-text tracking-wider">WHAT WE STAND FOR</h2>
+            <h2 className="font-display italic text-4xl md:text-5xl text-brand-text tracking-tight leading-[0.9]">What We Stand For</h2>
           </motion.div>
           <motion.div
             variants={stagger}
@@ -121,9 +122,9 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-display text-4xl md:text-5xl text-brand-text tracking-wider text-center mb-12"
+            className="font-display italic text-4xl md:text-5xl text-brand-text tracking-tight leading-[0.9] text-center mb-12"
           >
-            OUR JOURNEY
+            Our Journey
           </motion.h2>
           <div className="space-y-8">
             {TIMELINE.map((t, i) => (
@@ -148,8 +149,9 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="py-16 bg-brand-green/5 border-y border-brand-green/20">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="font-display text-4xl md:text-5xl text-brand-text tracking-wider mb-4">
-            READY TO EXPERIENCE<br />THE LAB?
+          <h2 className="font-display italic text-4xl md:text-5xl text-brand-text tracking-tight leading-[0.9] mb-4">
+            Ready to Experience<br />
+            <span className="text-gradient-fire">The Lab?</span>
           </h2>
           <p className="text-brand-muted mb-8">Order now for delivery across Burnley or swing by for collection.</p>
           <Link
