@@ -56,13 +56,8 @@ export function Hero() {
               <span className="block text-brand-text" style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}>THE</span>
               <span className="block text-brand-text" style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}>KEBAB</span>
               <span
-                className="block"
-                style={{
-                  fontSize: 'clamp(64px, 10vw, 120px)',
-                  background: 'linear-gradient(90deg, var(--color-brand-green), var(--color-brand-green-light))',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
+                className="block text-gradient-gold"
+                style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}
               >LAB</span>
             </motion.h1>
 
@@ -95,14 +90,18 @@ export function Hero() {
               custom={4} variants={fadeUp} initial="hidden" animate="visible"
               className="flex flex-wrap gap-x-6 gap-y-3 mt-10 pt-6 border-t border-brand-border"
             >
-              {STATS.map(({ icon: Icon, value, label }) => (
-                <div key={label} className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-brand-green" />
+              {STATS.map(({ icon: Icon, value, label }, idx) => (
+                <motion.div
+                  key={label}
+                  whileHover={{ y: -2 }}
+                  className="flex items-center gap-2"
+                >
+                  <Icon className={`w-4 h-4 ${idx === 0 ? 'text-brand-gold' : 'text-brand-green'}`} />
                   <div>
-                    <div className="font-display text-lg leading-none text-brand-text">{value}</div>
+                    <div className={`font-display text-lg leading-none ${idx === 0 ? 'text-brand-gold' : 'text-brand-text'}`}>{value}</div>
                     <div className="text-xs text-brand-dim leading-none mt-0.5">{label}</div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           </div>

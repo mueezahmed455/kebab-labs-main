@@ -12,10 +12,10 @@ export type OrderStatus =
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; icon: React.ElementType; color: string; bg: string; border: string }> = {
   pending:          { label: 'Pending',        icon: Clock,       color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/30' },
-  confirmed:        { label: 'Confirmed',      icon: CheckCircle, color: 'text-blue-400',   bg: 'bg-blue-400/10',   border: 'border-blue-400/30'   },
+  confirmed:        { label: 'Confirmed',      icon: CheckCircle, color: 'text-brand-gold',  bg: 'bg-brand-gold/10',  border: 'border-brand-gold/30'  },
   preparing:        { label: 'Preparing',      icon: ChefHat,     color: 'text-orange-400', bg: 'bg-orange-400/10', border: 'border-orange-400/30' },
   ready:            { label: 'Ready',          icon: Package,     color: 'text-brand-green', bg: 'bg-brand-green/10', border: 'border-brand-green/30' },
-  out_for_delivery: { label: 'On Its Way',     icon: Bike,        color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/30' },
+  out_for_delivery: { label: 'On Its Way',     icon: Bike,        color: 'text-brand-gold',  bg: 'bg-brand-gold/10',  border: 'border-brand-gold/30'  },
   delivered:        { label: 'Delivered',      icon: Star,        color: 'text-brand-green', bg: 'bg-brand-green/10', border: 'border-brand-green/30' },
   cancelled:        { label: 'Cancelled',      icon: XCircle,     color: 'text-red-400',    bg: 'bg-red-400/10',    border: 'border-red-400/30'    },
 }

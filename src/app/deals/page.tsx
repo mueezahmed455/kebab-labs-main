@@ -8,19 +8,19 @@ const DEALS = [
   {
     title: 'Shawarma Meal Deals',
     items: [
-      { name: 'Mix Shawarma & Donner', price: '£12.00', badge: 'Popular' },
-      { name: 'Mix Shawarma & Chicken Tikka', price: '£13.00' },
-      { name: 'Mix Shawarma & Chicken Wings', price: '£13.00' },
-      { name: 'Mix Shawarma & Kobeda', price: '£13.00' },
-      { name: 'Chicken Shawarma, Donner & Tikka', price: '£15.00' },
-      { name: 'Chicken Shawarma, Donner & Wings', price: '£15.00' },
-      { name: 'Tikka, Donner & Kobeda', price: '£15.00' },
-      { name: 'Lamb Shawarma, Donner & Tikka', price: '£15.00' },
-      { name: 'Lamb Shawarma, Donner & Wings', price: '£15.00' },
-      { name: 'Lamb Shawarma, Donner & Kobeda', price: '£16.00', badge: 'Premium' },
-      { name: 'Chicken Tikka & Wings', price: '£13.00' },
-      { name: 'Tikka, Wings & Kobeda', price: '£15.00' },
-      { name: 'Tikka, Donner & Kobeda', price: '£15.00' },
+      { name: 'Mix Shawarma & Donner', price: '£12.00', badge: 'Popular', desc: '' },
+      { name: 'Mix Shawarma & Chicken Tikka', price: '£13.00', desc: '' },
+      { name: 'Mix Shawarma & Chicken Wings', price: '£13.00', desc: '' },
+      { name: 'Mix Shawarma & Kobeda', price: '£13.00', desc: '' },
+      { name: 'Chicken Shawarma, Donner & Tikka', price: '£15.00', desc: '' },
+      { name: 'Chicken Shawarma, Donner & Wings', price: '£15.00', desc: '' },
+      { name: 'Tikka, Donner & Kobeda', price: '£15.00', desc: '' },
+      { name: 'Lamb Shawarma, Donner & Tikka', price: '£15.00', desc: '' },
+      { name: 'Lamb Shawarma, Donner & Wings', price: '£15.00', desc: '' },
+      { name: 'Lamb Shawarma, Donner & Kobeda', price: '£16.00', badge: 'Premium', desc: '' },
+      { name: 'Chicken Tikka & Wings', price: '£13.00', desc: '' },
+      { name: 'Tikka, Wings & Kobeda', price: '£15.00', desc: '' },
+      { name: 'Tikka, Donner & Kobeda', price: '£15.00', desc: '' },
     ],
     icon: Sparkles,
   },
@@ -28,13 +28,13 @@ const DEALS = [
     title: 'Kebab Lab Meal Deals',
     sub: 'Includes small chips & a drink',
     items: [
-      { name: 'Chicken Shawarma Meal', price: '£10.00' },
-      { name: 'Lamb Shawarma Meal', price: '£11.00' },
-      { name: 'Mix Shawarma Meal', price: '£12.00' },
-      { name: 'Single Kobeda Meal', price: '£10.00', badge: 'Best Value' },
-      { name: 'Double Kobeda Meal', price: '£14.50' },
-      { name: 'Chicken Tikka Meal', price: '£9.00' },
-      { name: 'Double Tikka Meal', price: '£15.00' },
+      { name: 'Chicken Shawarma Meal', price: '£10.00', desc: '' },
+      { name: 'Lamb Shawarma Meal', price: '£11.00', desc: '' },
+      { name: 'Mix Shawarma Meal', price: '£12.00', desc: '' },
+      { name: 'Single Kobeda Meal', price: '£10.00', badge: 'Best Value', desc: '' },
+      { name: 'Double Kobeda Meal', price: '£14.50', desc: '' },
+      { name: 'Chicken Tikka Meal', price: '£9.00', desc: '' },
+      { name: 'Double Tikka Meal', price: '£15.00', desc: '' },
     ],
     icon: Zap,
   },
@@ -111,7 +111,7 @@ export default function DealsPage() {
                           )}
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-                          {item.desc && <span className="hidden md:block text-brand-dim text-xs text-right max-w-[200px]">{item.desc}</span>}
+                          {item.desc && item.desc.length > 0 && <span className="hidden md:block text-brand-dim text-xs text-right max-w-[200px]">{item.desc}</span>}
                           <span className="font-display text-lg text-brand-green">{item.price}</span>
                         </div>
                       </div>

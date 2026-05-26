@@ -3,6 +3,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { createOrderSchema } from '@/lib/validations'
 import { apiError, apiSuccess } from '@/lib/api-error'
 import { rateLimit } from '@/lib/rate-limit'
+import { sendOrderConfirmation, sendAdminNewOrderAlert } from '@/lib/resend'
 
 export async function GET(request: NextRequest) {
   try {
@@ -45,7 +46,6 @@ export async function POST(request: NextRequest) {
 
     const { orderType, contact, deliveryAddress, items, subtotal, deliveryFee, total, paymentMethod, customerNotes } = parsed.data
 
-    // Server-side total verification: recalculate from items
     const calculatedSubtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
     if (Math.abs(calculatedSubtotal - subtotal) > 0.01) {
       return apiError(400, 'Subtotal does not match item prices')
@@ -53,7 +53,6 @@ export async function POST(request: NextRequest) {
 
     const admin = await createAdminClient()
 
-    // Validate delivery postcode if delivery
     if (orderType === 'delivery' && deliveryAddress) {
       const { data: valid } = await (admin.rpc as any)('is_valid_delivery_postcode', {
         p_postcode: deliveryAddress.postcode,
@@ -63,14 +62,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate order number
     const { data: orderNumber } = await (admin.rpc as any)('generate_order_number')
 
-    // Get user if authenticated
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await (await createClient()).auth.getUser()
 
-    // Create order
     const { data: order, error: orderError } = await (admin as any)
       .from('orders')
       .insert({
@@ -96,7 +91,6 @@ export async function POST(request: NextRequest) {
 
     if (orderError) throw orderError
 
-    // Create order items
     const orderItems = items.map((item) => ({
       order_id: order.id,
       item_id: item.menuItemId,
@@ -115,11 +109,52 @@ export async function POST(request: NextRequest) {
 
     if (itemsError) throw itemsError
 
-    // Log initial status
     await (admin as any).from('order_status_history').insert({
       order_id: order.id,
       status: 'pending',
     })
+
+    ;(async () => {
+      try {
+        await Promise.all([
+          sendOrderConfirmation({
+            email: contact.email,
+            customerName: contact.name,
+            orderNumber,
+            orderType,
+            items: items.map((i) => ({
+              name: i.name,
+              quantity: i.quantity,
+              total_price: i.unitPrice * i.quantity,
+              variant_label: i.variantLabel,
+              options: i.options,
+            })),
+            subtotal,
+            deliveryFee,
+            total,
+            estimatedTime: orderType === 'delivery' ? 45 : 20,
+            paymentMethod,
+            deliveryAddress: deliveryAddress ?? null,
+            customerNotes: customerNotes ?? null,
+          }),
+          sendAdminNewOrderAlert({
+            orderNumber,
+            customerName: contact.name,
+            orderType,
+            total,
+            items: items.map((i) => ({
+              name: i.name,
+              quantity: i.quantity,
+              total_price: i.unitPrice * i.quantity,
+            })),
+            customerNotes: customerNotes ?? null,
+            deliveryAddress: deliveryAddress ?? null,
+          }),
+        ])
+      } catch (emailErr) {
+        console.error('Failed to send order emails:', emailErr)
+      }
+    })()
 
     return apiSuccess(order, 201)
   } catch (error) {

@@ -77,7 +77,8 @@ export function OrderTracker({ order: initialOrder }: OrderTrackerProps) {
                   <motion.div
                     initial={{ scaleY: 0 }}
                     animate={{ scaleY: 1 }}
-                    className="absolute left-5 top-10 w-0.5 h-8 bg-brand-green origin-top"
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute left-5 top-10 w-0.5 h-8 bg-gradient-to-b from-brand-gold to-brand-green origin-top"
                   />
                 )}
 
@@ -85,8 +86,9 @@ export function OrderTracker({ order: initialOrder }: OrderTrackerProps) {
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0.4 }}
                   animate={{ scale: done ? 1 : 0.85, opacity: done ? 1 : 0.4 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 ${
-                    active ? 'bg-brand-green/20 border-brand-green text-brand-green' :
+                    active ? 'bg-brand-gold/20 border-brand-gold text-brand-gold' :
                     done   ? 'bg-brand-green/10 border-brand-green/40 text-brand-green' :
                              'bg-brand-surface border-brand-border text-brand-dim'
                   }`}

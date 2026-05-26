@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { Plus, Star } from 'lucide-react'
 import type { MenuItem, Category } from '@/types/menu'
 import { formatCurrency } from '@/lib/utils/formatting'
 import { useCart } from '@/lib/store/cartStore'
@@ -40,17 +40,16 @@ export function ItemCard({ item, category, onOpenModal }: ItemCardProps) {
 
   return (
     <motion.div
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="group bg-brand-card border border-brand-border rounded-2xl overflow-hidden hover:border-brand-green/40 hover:shadow-2xl hover:shadow-black/40 transition-all cursor-pointer"
+      whileHover={{ y: -5, transition: { duration: 0.25 } }}
+      className="group bg-brand-card border border-brand-border rounded-2xl overflow-hidden hover:border-brand-gold/30 hover:shadow-2xl hover:shadow-[var(--color-brand-glow-gold)] cursor-pointer"
       onClick={handleClick}
       onKeyDown={onKeyDown}
       role="button"
       tabIndex={0}
     >
-      {/* Image area */}
       <div
         className="h-40 relative overflow-hidden"
-        style={!item.image ? { background: `linear-gradient(135deg, ${category.accentColor}25, #07080f)` } : undefined}
+        style={!item.image ? { background: `linear-gradient(135deg, ${category.accentColor}25, #08080e)` } : undefined}
       >
         {item.image ? (
           <Image
@@ -58,20 +57,24 @@ export function ItemCard({ item, category, onOpenModal }: ItemCardProps) {
             alt={item.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
           <div className="h-full flex items-center justify-center text-5xl">{category.icon}</div>
         )}
-        {/* Gradient overlay */}
         {item.image && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
         )}
-        {item.badge && (
-          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-green text-brand-dark leading-tight z-10">
-            {item.badge}
+        <div className="absolute top-2 left-2 flex gap-1.5 z-10">
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/50 backdrop-blur-sm text-brand-gold leading-tight">
+            <Star className="w-2.5 h-2.5 fill-brand-gold" /> 4.9
           </span>
-        )}
+          {item.badge && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-gold text-brand-bg leading-tight">
+              {item.badge}
+            </span>
+          )}
+        </div>
         {(item.vegetarian || item.spicy) && (
           <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold border z-10 ${
             item.vegetarian
@@ -83,19 +86,21 @@ export function ItemCard({ item, category, onOpenModal }: ItemCardProps) {
         )}
       </div>
 
-      {/* Body */}
       <div className="p-3 flex items-end justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <p className="text-brand-white font-semibold text-sm leading-tight mb-1 line-clamp-1">{item.name}</p>
+          <p className="text-brand-text font-semibold text-sm leading-tight mb-1 line-clamp-1">{item.name}</p>
           <p className="text-brand-dim text-xs leading-snug line-clamp-2">{item.desc}</p>
         </div>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-          <span className="font-display text-lg text-brand-green leading-none">
+          <span className="font-display text-lg text-brand-gold leading-none">
             {item.sizes ? `From ${formatCurrency(item.sizes[0].price)}` : formatCurrency(item.price)}
           </span>
-          <div className="w-7 h-7 rounded-full bg-brand-green/10 border border-brand-green/30 flex items-center justify-center group-hover:bg-brand-green group-hover:border-brand-green transition-all">
-            <Plus className="w-3.5 h-3.5 text-brand-green group-hover:text-brand-dark transition-colors" />
-          </div>
+          <motion.div
+            whileHover={{ scale: 1.1, backgroundColor: 'var(--color-brand-green)', borderColor: 'var(--color-brand-green)' }}
+            className="w-7 h-7 rounded-full bg-brand-green/10 border border-brand-green/30 flex items-center justify-center transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5 text-brand-green transition-colors" />
+          </motion.div>
         </div>
       </div>
     </motion.div>

@@ -5,6 +5,7 @@ import { CategoryGrid } from '@/components/home/CategoryGrid'
 import { PopularItems } from '@/components/home/PopularItems'
 import { WhyUs } from '@/components/home/WhyUs'
 import { Testimonials } from '@/components/home/Testimonials'
+import { PageTransition } from '@/components/common/PageTransition'
 
 export const metadata: Metadata = {
   title: 'The Kebab Lab — Premium Clay Oven Kebabs, Pizza & Shawarma | Burnley',
@@ -14,13 +15,13 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <>
+    <PageTransition>
       <Hero />
       <FeaturesBar />
       <CategoryGrid />
       <PopularItems />
       <Testimonials />
       <WhyUs />
-    </>
+    </PageTransition>
   )
 }

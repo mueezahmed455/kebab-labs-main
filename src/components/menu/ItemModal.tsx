@@ -103,7 +103,7 @@ export function ItemModal({ item, category, onClose }: ItemModalProps) {
               {/* Header image area */}
               <div
                 className="relative h-52 overflow-hidden"
-                style={!item.image ? { background: `linear-gradient(135deg, ${category?.accentColor ?? '#84cc16'}22, #07080f)` } : undefined}
+                style={!item.image ? { background: `linear-gradient(135deg, ${category?.accentColor ?? '#84cc16'}22, var(--color-brand-bg))` } : undefined}
               >
                 {item.image ? (
                   <>

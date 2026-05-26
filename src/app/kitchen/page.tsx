@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { CheckCircle, AlertTriangle, FlaskConical } from 'lucide-react'
+import { CheckCircle, AlertTriangle, FlaskConical, Clock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
@@ -15,27 +15,104 @@ interface KitchenOrder {
   order_items: { name: string; quantity: number; notes: string | null }[]
 }
 
-function ageColor(createdAt: string): string {
-  const mins = (Date.now() - new Date(createdAt).getTime()) / 60_000
-  if (mins < 10) return 'border-brand-green'
-  if (mins < 20) return 'border-yellow-400'
-  return 'border-red-500 animate-pulse'
+function useAge(createdAt: string): { mins: number; color: string; label: string } {
+  const calc = () => {
+    const mins = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60_000)
+    const color = mins < 10 ? 'border-brand-green' : mins < 20 ? 'border-yellow-400' : 'border-red-500 animate-pulse'
+    return { mins, color, label: `${mins}m ago` }
+  }
+  const [age, setAge] = useState(calc)
+  useEffect(() => {
+    setAge(calc())
+    const id = setInterval(() => setAge(calc()), 15_000)
+    return () => clearInterval(id)
+  }, [createdAt])
+  return age
 }
 
-function ageLabel(createdAt: string): string {
-  const mins = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60_000)
-  return `${mins}m ago`
+function OrderCard({ order, onComplete, completing }: {
+  order: KitchenOrder
+  onComplete: (o: KitchenOrder) => void
+  completing: string | null
+}) {
+  const { mins, color, label } = useAge(order.created_at)
+  const isUrgent = mins > 20
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.85 }}
+      className={cn('bg-brand-card border-2 rounded-2xl p-5 flex flex-col gap-4', color)}
+    >
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="font-display text-brand-text text-xl tracking-wider">{order.order_number}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <Clock className="w-3 h-3 text-brand-dim" />
+            <p className="text-brand-muted text-xs">{label}</p>
+            <span className="text-brand-dim text-xs">·</span>
+            <span className="text-brand-muted text-xs capitalize">{order.order_type}</span>
+          </div>
+        </div>
+        {isUrgent && (
+          <div className="flex items-center gap-1 text-red-400 text-xs font-semibold">
+            <AlertTriangle className="w-4 h-4" />
+            URGENT
+          </div>
+        )}
+      </div>
+
+      <ul className="flex-1 space-y-2">
+        {order.order_items.map((item, i) => (
+          <li key={i} className="flex items-start gap-2">
+            <span className="w-6 h-6 rounded-lg bg-brand-green text-brand-bg text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+              {item.quantity}
+            </span>
+            <div>
+              <p className="text-brand-text text-sm font-medium leading-tight">{item.name}</p>
+              {item.notes && <p className="text-brand-dim text-xs italic">{item.notes}</p>}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {order.customer_notes && (
+        <p className="text-brand-dim text-xs bg-brand-surface rounded-lg p-2 italic">
+          📝 {order.customer_notes}
+        </p>
+      )}
+
+      <button
+        onClick={() => onComplete(order)}
+        disabled={completing === order.id}
+        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-brand-green text-brand-bg font-bold text-sm hover:bg-brand-green-dark transition-all active:scale-95 disabled:opacity-50"
+      >
+        {completing === order.id ? (
+          <span className="w-4 h-4 border-2 border-brand-bg border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <><CheckCircle className="w-4 h-4" /> {order.order_type === 'delivery' ? 'Send Out' : 'Mark Ready'}</>
+        )}
+      </button>
+    </motion.div>
+  )
 }
 
 export default function KitchenPage() {
   const [orders, setOrders] = useState<KitchenOrder[]>([])
   const [completing, setCompleting] = useState<string | null>(null)
-  const [tick, setTick] = useState(0)
+  const [authed, setAuthed] = useState<boolean | null>(null)
 
-  // Refresh age labels every minute
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 30_000)
-    return () => clearInterval(id)
+    const check = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setAuthed(false); return }
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      setAuthed((profile as { role: string } | null)?.role === 'admin')
+    }
+    check()
   }, [])
 
   const fetchOrders = useCallback(async () => {
@@ -49,6 +126,7 @@ export default function KitchenPage() {
   }, [])
 
   useEffect(() => {
+    if (!authed) return
     fetchOrders()
     const supabase = createClient()
     const channel = supabase
@@ -56,7 +134,7 @@ export default function KitchenPage() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
       .subscribe()
     return () => { supabase.removeChannel(channel) }
-  }, [fetchOrders])
+  }, [authed, fetchOrders])
 
   const complete = async (order: KitchenOrder) => {
     setCompleting(order.id)
@@ -76,14 +154,33 @@ export default function KitchenPage() {
     }
   }
 
+  if (authed === null) {
+    return (
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-brand-green border-t-transparent animate-spin" />
+      </div>
+    )
+  }
+
+  if (authed === false) {
+    return (
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center text-center px-4">
+        <div>
+          <AlertTriangle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h1 className="font-display text-4xl text-brand-text tracking-wider mb-2">ACCESS DENIED</h1>
+          <p className="text-brand-muted">You need admin privileges to view this page.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-brand-dark p-6">
-      {/* Header */}
+    <div className="min-h-screen bg-brand-bg p-6">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <FlaskConical className="w-8 h-8 text-brand-green" />
           <div>
-            <h1 className="font-display text-4xl text-brand-white tracking-wider">KITCHEN</h1>
+            <h1 className="font-display text-4xl text-brand-text tracking-wider">KITCHEN</h1>
             <p className="text-brand-muted text-sm">{orders.length} active order{orders.length !== 1 ? 's' : ''}</p>
           </div>
         </div>
@@ -94,7 +191,6 @@ export default function KitchenPage() {
         </div>
       </div>
 
-      {/* Order grid */}
       <AnimatePresence>
         {orders.length === 0 ? (
           <motion.div
@@ -108,60 +204,7 @@ export default function KitchenPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {orders.map((order) => (
-              <motion.div
-                key={order.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.85 }}
-                className={cn('bg-brand-card border-2 rounded-2xl p-5 flex flex-col gap-4', ageColor(order.created_at))}
-              >
-                {/* Order header */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-display text-brand-white text-xl tracking-wider">{order.order_number}</p>
-                    <p className="text-brand-muted text-xs">{ageLabel(order.created_at)} · {order.order_type}</p>
-                  </div>
-                  {(Date.now() - new Date(order.created_at).getTime()) > 20 * 60_000 && (
-                    <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                  )}
-                </div>
-
-                {/* Items */}
-                <ul className="flex-1 space-y-2">
-                  {order.order_items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="w-6 h-6 rounded-lg bg-brand-green text-brand-dark text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                        {item.quantity}
-                      </span>
-                      <div>
-                        <p className="text-brand-white text-sm font-medium leading-tight">{item.name}</p>
-                        {item.notes && <p className="text-brand-muted text-xs italic">{item.notes}</p>}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* Customer notes */}
-                {order.customer_notes && (
-                  <p className="text-brand-muted text-xs bg-brand-surface rounded-lg p-2 italic">
-                    📝 {order.customer_notes}
-                  </p>
-                )}
-
-                {/* Complete button */}
-                <button
-                  onClick={() => complete(order)}
-                  disabled={completing === order.id}
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-brand-green text-brand-dark font-bold text-sm hover:bg-brand-green-dark transition-all active:scale-95 disabled:opacity-50"
-                >
-                  {completing === order.id ? (
-                    <span className="w-4 h-4 border-2 border-brand-dark border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <><CheckCircle className="w-4 h-4" /> {order.order_type === 'delivery' ? 'Send Out' : 'Mark Ready'}</>
-                  )}
-                </button>
-              </motion.div>
+              <OrderCard key={order.id} order={order} onComplete={complete} completing={completing} />
             ))}
           </div>
         )}

@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { deliveryCheckSchema } from '@/lib/validations'
 import { DELIVERY_POSTCODE_PREFIXES } from '@/lib/constants'
+import { apiError, apiSuccess } from '@/lib/api-error'
+import { BRAND } from '@/lib/data/brand'
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,10 +10,7 @@ export async function POST(request: NextRequest) {
     const parsed = deliveryCheckSchema.safeParse(body)
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Invalid postcode format' },
-        { status: 400 }
-      )
+      return apiError(400, 'Invalid postcode format')
     }
 
     const postcode = parsed.data.postcode.toUpperCase().replace(/\s/g, '')
@@ -19,16 +18,13 @@ export async function POST(request: NextRequest) {
 
     const inRange = DELIVERY_POSTCODE_PREFIXES.includes(prefix as typeof DELIVERY_POSTCODE_PREFIXES[number])
 
-    return NextResponse.json({
+    return apiSuccess({
       available: inRange,
       postcode: parsed.data.postcode,
-      fee: inRange ? 2.49 : null,
+      fee: inRange ? BRAND.delivery.fee : null,
       estimatedMinutes: 45,
     })
   } catch {
-    return NextResponse.json(
-      { error: 'Failed to check delivery availability' },
-      { status: 500 }
-    )
+    return apiError(500, 'Failed to check delivery availability')
   }
 }
