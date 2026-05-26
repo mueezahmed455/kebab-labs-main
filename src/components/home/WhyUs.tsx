@@ -33,9 +33,24 @@ const STATS = [
   { value: '100+', label: 'Menu Items' },
 ]
 
+const container = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+}
+
+const reasonAnim = {
+  hidden: { opacity: 0, x: -16 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
+}
+
+const statAnim = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
+}
+
 export function WhyUs() {
   return (
-    <section id="about" className="py-16 md:py-24 bg-brand-dark">
+    <section id="about" className="py-16 md:py-24 bg-brand-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Left — reasons */}
@@ -46,22 +61,28 @@ export function WhyUs() {
             transition={{ duration: 0.6 }}
           >
             <p className="text-brand-green text-sm font-medium tracking-widest uppercase mb-2">Why Choose Us</p>
-            <h2 className="font-display text-4xl md:text-5xl text-brand-white tracking-wider mb-8">
+            <h2 className="font-display text-4xl md:text-5xl text-brand-text tracking-wider mb-8">
               THE SCIENCE<br />OF FLAVOUR
             </h2>
-            <div className="space-y-6">
+            <motion.div
+              variants={container}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
               {REASONS.map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="flex gap-4">
+                <motion.div key={title} variants={reasonAnim} className="flex gap-4">
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-green/10 border border-brand-green/20 flex items-center justify-center">
                     <Icon className="w-5 h-5 text-brand-green" />
                   </div>
                   <div>
-                    <h3 className="text-brand-white font-semibold mb-1">{title}</h3>
+                    <h3 className="text-brand-text font-semibold mb-1">{title}</h3>
                     <p className="text-brand-muted text-sm leading-relaxed">{desc}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Right — stats */}
@@ -72,34 +93,43 @@ export function WhyUs() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:pt-16"
           >
-            <div className="grid grid-cols-2 gap-4">
-              {STATS.map(({ value, label }, i) => (
+            <motion.div
+              variants={container}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-2 gap-4"
+            >
+              {STATS.map(({ value, label }) => (
                 <motion.div
                   key={label}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
-                  className="bg-brand-card border border-brand-border rounded-2xl p-6 text-center"
+                  variants={statAnim}
+                  className="bg-brand-card border border-brand-border rounded-2xl p-6 text-center hover:border-brand-green/30 transition-colors"
                 >
                   <div className="font-display text-4xl text-brand-green mb-1">{value}</div>
                   <div className="text-brand-muted text-sm">{label}</div>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             {/* CTA card */}
-            <div className="mt-4 p-6 rounded-2xl bg-brand-green/5 border border-brand-green/20">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mt-4 p-6 rounded-2xl bg-brand-green/5 border border-brand-green/20"
+            >
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-brand-green/20 flex items-center justify-center flex-shrink-0">
                   <Flame className="w-5 h-5 text-brand-green" />
                 </div>
                 <div>
-                  <h4 className="text-brand-white font-semibold mb-1">Order Tonight</h4>
+                  <h4 className="text-brand-text font-semibold mb-1">Order Tonight</h4>
                   <p className="text-brand-muted text-sm">Open 4PM – 12:40AM (Tuesday closed). Delivery from £{BRAND.delivery.fee.toFixed(2)}. Free over £{BRAND.delivery.freeOver}.</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>

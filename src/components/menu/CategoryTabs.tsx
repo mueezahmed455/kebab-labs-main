@@ -33,7 +33,6 @@ export function CategoryTabs({ categories, search, onSearchChange }: CategoryTab
     scrollTabIntoView(id)
   }, [scrollTabIntoView])
 
-  // IntersectionObserver to track active section
   useEffect(() => {
     const observers: IntersectionObserver[] = []
     const sections = categories.map((c) => document.getElementById(c.id)).filter(Boolean) as HTMLElement[]
@@ -56,10 +55,9 @@ export function CategoryTabs({ categories, search, onSearchChange }: CategoryTab
   }, [categories, scrollTabIntoView])
 
   return (
-    <div className="sticky top-16 z-40 bg-brand-navy border-b border-brand-border">
+    <div className="sticky top-16 z-40 bg-brand-bg border-b border-brand-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 py-3">
-          {/* Tabs */}
           <div
             ref={scrollRef}
             className="flex-1 flex gap-2 overflow-x-auto hide-scrollbar"
@@ -77,7 +75,7 @@ export function CategoryTabs({ categories, search, onSearchChange }: CategoryTab
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
                   activeId === cat.id
                     ? 'bg-brand-green text-brand-dark'
-                    : 'bg-brand-card border border-brand-border text-brand-muted hover:text-brand-white hover:border-brand-green/30'
+                    : 'bg-brand-card border border-brand-border text-brand-muted hover:text-brand-text hover:border-brand-green/30'
                 )}
               >
                 <span>{cat.icon}</span>
@@ -86,7 +84,6 @@ export function CategoryTabs({ categories, search, onSearchChange }: CategoryTab
             ))}
           </div>
 
-          {/* Search */}
           <div className="relative flex-shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-dim" />
             <input
@@ -95,7 +92,7 @@ export function CategoryTabs({ categories, search, onSearchChange }: CategoryTab
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search…"
               aria-label="Search menu items"
-              className="w-36 sm:w-48 pl-9 pr-3 py-1.5 rounded-xl bg-brand-card border border-brand-border text-brand-white text-sm placeholder:text-brand-dim focus:outline-none focus:border-brand-green/50 transition-colors"
+              className="w-36 sm:w-48 pl-9 pr-3 py-1.5 rounded-xl bg-brand-card border border-brand-border text-brand-text text-sm placeholder:text-brand-dim focus:outline-none focus:border-brand-green/50 transition-colors"
             />
           </div>
         </div>

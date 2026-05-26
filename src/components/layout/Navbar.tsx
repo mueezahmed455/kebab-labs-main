@@ -2,21 +2,23 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingCart, FlaskConical, Menu, X } from 'lucide-react'
+import { ShoppingCart, FlaskConical, Menu, X, Moon, Sun } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '@/lib/store/cartStore'
 import { isOpenNow } from '@/lib/utils/isOpen'
+import { useTheme } from '@/lib/theme-provider'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/menu', label: 'Menu' },
-  { href: '/#deals', label: 'Deals' },
-  { href: '/#about', label: 'About' },
+  { href: '/deals', label: 'Deals' },
+  { href: '/about', label: 'About' },
 ]
 
 export function Navbar() {
   const pathname = usePathname()
+  const { theme, toggle: toggleTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [open, setOpen] = useState(false)
@@ -35,15 +37,14 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Close mobile menu on route change
   useEffect(() => setMobileOpen(false), [pathname])
 
   return (
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-          scrolled ? 'glass-nav shadow-lg shadow-black/30' : 'glass-nav'
+          'fixed top-0 left-0 right-0 z-50',
+          scrolled ? 'glass-nav shadow-lg shadow-brand-shadow' : 'glass-nav'
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,7 +55,7 @@ export function Navbar() {
                 <FlaskConical className="w-5 h-5 text-brand-green" />
               </div>
               <div>
-                <div className="font-display text-xl leading-none text-brand-white tracking-wider">
+                <div className="font-display text-xl leading-none text-brand-text tracking-wider">
                   THE KEBAB LAB
                 </div>
                 <div className="text-[10px] text-brand-green leading-none tracking-widest uppercase">
@@ -80,7 +81,38 @@ export function Navbar() {
             </nav>
 
             {/* Right side */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-surface border border-brand-border hover:border-brand-green/30 transition-colors"
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                <AnimatePresence mode="wait">
+                  {theme === 'dark' ? (
+                    <motion.span
+                      key="sun"
+                      initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                      animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                      exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <Sun className="w-4 h-4 text-brand-warm" />
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="moon"
+                      initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                      animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                      exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <Moon className="w-4 h-4 text-brand-text" />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+
               {/* Open/closed badge */}
               <div
                 className={cn(
@@ -122,7 +154,7 @@ export function Navbar() {
                 className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-brand-surface border border-brand-border hover:border-brand-green/30 transition-colors"
                 aria-label="Toggle menu"
               >
-                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileOpen ? <X className="w-5 h-5 text-brand-text" /> : <Menu className="w-5 h-5 text-brand-text" />}
               </button>
             </div>
           </div>
@@ -154,19 +186,26 @@ export function Navbar() {
                   href={link.href}
                   className={cn(
                     'flex items-center py-3 text-base font-medium border-b border-brand-border transition-colors',
-                    pathname === link.href ? 'text-brand-green' : 'text-brand-muted hover:text-brand-white'
+                    pathname === link.href ? 'text-brand-green' : 'text-brand-muted hover:text-brand-text'
                   )}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-6">
+              <div className="mt-6 flex flex-col gap-3">
                 <Link
                   href="/menu"
                   className="flex items-center justify-center w-full py-3 rounded-xl bg-brand-green text-brand-dark font-bold text-sm hover:bg-brand-green-dark transition-colors"
                 >
                   Order Now
                 </Link>
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-brand-border text-brand-muted text-sm hover:text-brand-text transition-colors"
+                >
+                  {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </button>
               </div>
             </motion.nav>
           </>

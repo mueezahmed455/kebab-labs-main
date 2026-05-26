@@ -1,4 +1,6 @@
+'use client'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { FlaskConical, Phone, MapPin, Clock, Share2, Globe } from 'lucide-react'
 import { BRAND } from '@/lib/data/brand'
 
@@ -12,19 +14,34 @@ const HOURS_DISPLAY = [
   { day: 'Sunday',    time: '4:00 PM – 12:40 AM' },
 ]
 
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+}
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
+}
+
 export function Footer() {
   return (
-    <footer className="bg-brand-navy border-t border-brand-border mt-20">
+    <footer className="bg-brand-card/50 border-t border-brand-border mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10"
+        >
           {/* Brand */}
-          <div className="lg:col-span-1">
+          <motion.div variants={fadeUp} className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-brand-green/10 border border-brand-green/30">
                 <FlaskConical className="w-5 h-5 text-brand-green" />
               </div>
               <div>
-                <div className="font-display text-lg leading-none text-brand-white tracking-wider">THE KEBAB LAB</div>
+                <div className="font-display text-lg leading-none text-brand-text tracking-wider">THE KEBAB LAB</div>
                 <div className="text-[10px] text-brand-green leading-none tracking-widest uppercase">Clay Oven Specialist</div>
               </div>
             </div>
@@ -51,18 +68,19 @@ export function Footer() {
                 <Globe className="w-4 h-4 text-brand-muted hover:text-brand-green" />
               </a>
             </div>
-          </div>
+          </motion.div>
 
           {/* Quick links */}
-          <div>
-            <h3 className="font-display text-lg tracking-wider text-brand-white mb-4">Quick Links</h3>
+          <motion.div variants={fadeUp}>
+            <h3 className="font-display text-lg tracking-wider text-brand-text mb-4">Quick Links</h3>
             <ul className="space-y-2">
               {[
                 { href: '/', label: 'Home' },
                 { href: '/menu', label: 'Full Menu' },
+                { href: '/deals', label: 'Meal Deals' },
+                { href: '/about', label: 'About Us' },
                 { href: '/menu#pizza', label: 'Pizza' },
                 { href: '/menu#sharing', label: 'Sharing Platters' },
-                { href: '/checkout', label: 'Order Now' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-brand-muted text-sm hover:text-brand-green transition-colors">
@@ -71,11 +89,11 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Opening hours */}
-          <div>
-            <h3 className="font-display text-lg tracking-wider text-brand-white mb-4 flex items-center gap-2">
+          <motion.div variants={fadeUp}>
+            <h3 className="font-display text-lg tracking-wider text-brand-text mb-4 flex items-center gap-2">
               <Clock className="w-4 h-4 text-brand-green" />
               Opening Hours
             </h3>
@@ -83,15 +101,15 @@ export function Footer() {
               {HOURS_DISPLAY.map(({ day, time, closed }) => (
                 <li key={day} className="flex justify-between text-sm">
                   <span className="text-brand-muted">{day}</span>
-                  <span className={closed ? 'text-red-400' : 'text-brand-white'}>{time}</span>
+                  <span className={closed ? 'text-red-400' : 'text-brand-text'}>{time}</span>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Contact */}
-          <div>
-            <h3 className="font-display text-lg tracking-wider text-brand-white mb-4">Contact Us</h3>
+          <motion.div variants={fadeUp}>
+            <h3 className="font-display text-lg tracking-wider text-brand-text mb-4">Contact Us</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-brand-green mt-0.5 flex-shrink-0" />
@@ -112,17 +130,23 @@ export function Footer() {
                 Order Now →
               </Link>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="mt-10 pt-6 border-t border-brand-border flex flex-col sm:flex-row items-center justify-between gap-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+          className="mt-10 pt-6 border-t border-brand-border flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
           <p className="text-brand-dim text-sm">
             © {new Date().getFullYear()} The Kebab Lab. All rights reserved.
           </p>
           <p className="text-brand-dim text-xs">
-            Minimum delivery order £{BRAND.delivery.minimumOrder} · Free delivery over £{BRAND.delivery.freeOver} · {BRAND.delivery.radiusMiles}-mile radius
+            Min. delivery £{BRAND.delivery.minimumOrder} · Free over £{BRAND.delivery.freeOver} · {BRAND.delivery.radiusMiles}-mile radius
           </p>
-        </div>
+        </motion.div>
       </div>
     </footer>
   )

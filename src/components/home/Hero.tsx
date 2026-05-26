@@ -9,7 +9,7 @@ const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.65, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+    transition: { duration: 0.65, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] },
   }),
 }
 
@@ -28,7 +28,7 @@ const FOOD_IMAGES = [
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-brand-dark">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-brand-bg">
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-brand-green/5 blur-3xl" />
@@ -40,6 +40,7 @@ export function Hero() {
 
           {/* Left — content */}
           <div>
+            {/* Animated live-badge */}
             <motion.div
               custom={0} variants={fadeUp} initial="hidden" animate="visible"
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-green/30 bg-brand-green/5 text-brand-green text-sm font-medium mb-6"
@@ -52,13 +53,13 @@ export function Hero() {
               custom={1} variants={fadeUp} initial="hidden" animate="visible"
               className="font-display leading-none tracking-wider"
             >
-              <span className="block text-brand-white" style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}>THE</span>
-              <span className="block text-brand-white" style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}>KEBAB</span>
+              <span className="block text-brand-text" style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}>THE</span>
+              <span className="block text-brand-text" style={{ fontSize: 'clamp(64px, 10vw, 120px)' }}>KEBAB</span>
               <span
                 className="block"
                 style={{
                   fontSize: 'clamp(64px, 10vw, 120px)',
-                  background: 'linear-gradient(90deg, #84cc16, #a3e635)',
+                  background: 'linear-gradient(90deg, var(--color-brand-green), var(--color-brand-green-light))',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -84,7 +85,7 @@ export function Hero() {
               </Link>
               <Link
                 href="/menu"
-                className="flex items-center gap-2 px-7 py-3.5 rounded-xl border border-brand-green/30 text-brand-white font-medium text-sm hover:bg-brand-green/5 hover:border-brand-green/60 transition-all"
+                className="flex items-center gap-2 px-7 py-3.5 rounded-xl border border-brand-green/30 text-brand-text font-medium text-sm hover:bg-brand-green/5 hover:border-brand-green/60 transition-all"
               >
                 View Full Menu
               </Link>
@@ -98,7 +99,7 @@ export function Hero() {
                 <div key={label} className="flex items-center gap-2">
                   <Icon className="w-4 h-4 text-brand-green" />
                   <div>
-                    <div className="font-display text-lg leading-none text-brand-white">{value}</div>
+                    <div className="font-display text-lg leading-none text-brand-text">{value}</div>
                     <div className="text-xs text-brand-dim leading-none mt-0.5">{label}</div>
                   </div>
                 </div>
@@ -113,8 +114,8 @@ export function Hero() {
                 key={src}
                 initial={{ opacity: 0, y: 40, scale: 0.92 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-                className={`absolute rounded-3xl overflow-hidden shadow-2xl border border-white/10 ${rotate}`}
+                transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+                className={`absolute rounded-3xl overflow-hidden shadow-2xl border border-brand-border ${rotate}`}
                 style={{
                   width: 260,
                   height: 320,
@@ -145,7 +146,7 @@ export function Hero() {
                 <Star className="w-4 h-4 text-brand-green fill-brand-green" />
               </div>
               <div>
-                <p className="text-brand-white text-xs font-bold">4.9 / 5 Stars</p>
+                <p className="text-brand-text text-xs font-bold">4.9 / 5 Stars</p>
                 <p className="text-brand-dim text-[10px]">500+ reviews</p>
               </div>
             </motion.div>

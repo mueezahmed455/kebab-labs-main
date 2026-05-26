@@ -4,6 +4,7 @@ import { FeaturesBar } from '@/components/home/FeaturesBar'
 import { CategoryGrid } from '@/components/home/CategoryGrid'
 import { PopularItems } from '@/components/home/PopularItems'
 import { WhyUs } from '@/components/home/WhyUs'
+import { Testimonials } from '@/components/home/Testimonials'
 
 export const metadata: Metadata = {
   title: 'The Kebab Lab — Premium Clay Oven Kebabs, Pizza & Shawarma | Burnley',
@@ -18,6 +19,7 @@ export default function HomePage() {
       <FeaturesBar />
       <CategoryGrid />
       <PopularItems />
+      <Testimonials />
       <WhyUs />
     </>
   )

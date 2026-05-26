@@ -1,114 +1,160 @@
 @import "tailwindcss";
 
+/* ── Theme tokens (dark = default) ──────────────────────────── */
 @theme {
-  /* Brand colours */
-  --color-brand-dark: #07080f;
-  --color-brand-navy: #0c1020;
+  --color-brand-bg: #07080f;
   --color-brand-card: #0d1526;
   --color-brand-card-hover: #12203a;
   --color-brand-surface: #111827;
   --color-brand-border: #1e293b;
+  --color-brand-text: #f8fafc;
+  --color-brand-muted: #94a3b8;
+  --color-brand-dim: #475569;
   --color-brand-green: #84cc16;
   --color-brand-green-dark: #65a30d;
   --color-brand-green-light: #bef264;
-  --color-brand-white: #f8fafc;
-  --color-brand-muted: #94a3b8;
-  --color-brand-dim: #475569;
+  --color-brand-warm: #d97706;
+  --color-brand-glow: rgba(132, 204, 22, 0.15);
+  --color-brand-shadow: rgba(0, 0, 0, 0.5);
 
-  /* Typography */
+  /* Backward compat aliases for existing component usage */
+  --color-brand-dark: var(--color-brand-bg);
+  --color-brand-navy: var(--color-brand-bg);
+  --color-brand-white: var(--color-brand-text);
+
   --font-display: var(--font-bebas);
   --font-sans: var(--font-jakarta);
 
-  /* Radius */
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
 }
 
-@custom-variant dark (&:is(.dark *));
-@custom-variant light (&:is(.light *));
+/* ── Light theme overrides ─────────────────────────────────── */
+.light {
+  --color-brand-bg: #faf7f2;
+  --color-brand-card: #ffffff;
+  --color-brand-card-hover: #f5f0ea;
+  --color-brand-surface: #f0ebe4;
+  --color-brand-border: #e5ddd0;
+  --color-brand-text: #1a1410;
+  --color-brand-muted: #7a6e5e;
+  --color-brand-dim: #b8a99a;
+  --color-brand-green: #65a30d;
+  --color-brand-green-dark: #4d7c0f;
+  --color-brand-green-light: #84cc16;
+  --color-brand-warm: #ea580c;
+  --color-brand-glow: rgba(101, 163, 13, 0.12);
+  --color-brand-shadow: rgba(0, 0, 0, 0.08);
 
-:root {
-  --glow-green: 0 0 40px rgba(132, 204, 22, 0.15);
-  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.5);
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-green: rgba(132, 204, 22, 0.25);
+  --brand-surface-rgb: 240, 235, 228;
+  --brand-card-rgb: 255, 255, 255;
+  --brand-bg-rgb: 250, 247, 242;
 }
 
-* {
-  box-sizing: border-box;
+/* ── Dark theme overrides (default already matches @theme) ─── */
+.dark {
+  --brand-surface-rgb: 17, 24, 39;
+  --brand-card-rgb: 13, 21, 38;
+  --brand-bg-rgb: 7, 8, 15;
 }
 
+/* ── Smooth transitions on everything theme-related ────────── */
 html {
   scroll-behavior: smooth;
 }
 
+html,
+html *,
+html *::before,
+html *::after {
+  transition: background-color 0.35s ease,
+              color 0.35s ease,
+              border-color 0.35s ease,
+              box-shadow 0.35s ease,
+              opacity 0.35s ease;
+}
+
+/* Exclude animations & transforms from the global transition so hover FX aren't delayed */
+html *,
+html *::before,
+html *::after {
+  transition-property: background-color, color, border-color, box-shadow, opacity;
+}
+
+* { box-sizing: border-box; }
+
 body {
-  background-color: #07080f;
-  color: #f8fafc;
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+/* ── Scrollbar (dark stays; light uses warm tones) ─────────── */
+.light ::-webkit-scrollbar-track {
+  background: #e8ddd0;
 }
-::-webkit-scrollbar-track {
-  background: #0c1020;
+.light ::-webkit-scrollbar-thumb {
+  background: #c4b5a0;
 }
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #84cc16;
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #65a30d;
 }
 
-/* Hide horizontal scrollbar on category tabs */
+.dark ::-webkit-scrollbar-track {
+  background: #0c1020;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #84cc16;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { border-radius: 3px; }
+
+/* ── Utility classes ──────────────────────────────────────── */
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
 
-/* Glassmorphism */
 .glass {
   background: rgba(13, 21, 38, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.light .glass {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(0, 0, 0, 0.07);
 }
 
 .glass-nav {
   background: rgba(7, 8, 15, 0.8);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.light .glass-nav {
+  background: rgba(250, 247, 242, 0.85);
+  border-bottom-color: rgba(0, 0, 0, 0.07);
 }
 
-/* Green glow utility */
-.glow-green {
-  box-shadow: var(--glow-green);
-}
+.glow-green { box-shadow: 0 0 40px var(--color-brand-glow); }
 
-/* Gradient border utility */
-.gradient-border {
-  border: 1px solid var(--border-green);
-}
+.gradient-border { border: 1px solid rgba(132, 204, 22, 0.25); }
+.light .gradient-border { border-color: rgba(101, 163, 13, 0.25); }
 
-/* Pulse animation for open/closed dot */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.2); }
 }
-.pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
-}
+.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
 
-/* Category card gradient overlays */
+/* ── Category gradient overlays ───────────────────────────── */
 .gradient-kebabs    { background: linear-gradient(135deg, #ea580c22, #07080f); }
 .gradient-shawarma  { background: linear-gradient(135deg, #9333ea22, #07080f); }
 .gradient-donner    { background: linear-gradient(135deg, #dc262622, #07080f); }
@@ -119,3 +165,22 @@ body {
 .gradient-sharing   { background: linear-gradient(135deg, #0891b222, #07080f); }
 .gradient-extras    { background: linear-gradient(135deg, #b4530922, #07080f); }
 .gradient-drinks    { background: linear-gradient(135deg, #1d4ed822, #07080f); }
+.light .gradient-kebabs   { background: linear-gradient(135deg, #ea580c15, #faf7f2); }
+.light .gradient-shawarma { background: linear-gradient(135deg, #9333ea15, #faf7f2); }
+.light .gradient-donner   { background: linear-gradient(135deg, #dc262615, #faf7f2); }
+.light .gradient-combos   { background: linear-gradient(135deg, #d9770615, #faf7f2); }
+.light .gradient-deals    { background: linear-gradient(135deg, #16a34a15, #faf7f2); }
+.light .gradient-burgers  { background: linear-gradient(135deg, #ca8a0415, #faf7f2); }
+.light .gradient-pizza    { background: linear-gradient(135deg, #e11d4815, #faf7f2); }
+.light .gradient-sharing  { background: linear-gradient(135deg, #0891b215, #faf7f2); }
+.light .gradient-extras   { background: linear-gradient(135deg, #b4530915, #faf7f2); }
+.light .gradient-drinks   { background: linear-gradient(135deg, #1d4ed815, #faf7f2); }
+
+/* ── Page transition wrapper ──────────────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: fadeSlideUp 0.45s ease-out both;
+}
