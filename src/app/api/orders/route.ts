@@ -5,6 +5,8 @@ import { apiError, apiSuccess } from '@/lib/api-error'
 import { rateLimit } from '@/lib/rate-limit'
 import { sendOrderConfirmation, sendAdminNewOrderAlert } from '@/lib/resend'
 
+const DELIVERY_FEE = 1.99
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -44,19 +46,81 @@ export async function POST(request: NextRequest) {
       return apiError(400, 'Validation failed', parsed.error.flatten())
     }
 
-    const { orderType, contact, deliveryAddress, items, subtotal, deliveryFee, total, paymentMethod, customerNotes, promoCode, discount = 0 } = parsed.data
+    const { orderType, contact, deliveryAddress, items, subtotal, deliveryFee, total, paymentMethod, customerNotes, promoCode } = parsed.data
 
+    // Verify client-provided subtotal is internally consistent
     const calculatedSubtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
     if (Math.abs(calculatedSubtotal - subtotal) > 0.01) {
       return apiError(400, 'Subtotal does not match item prices')
     }
 
-    const expectedTotal = Math.max(0, calculatedSubtotal + deliveryFee - discount)
-    if (Math.abs(expectedTotal - total) > 0.01) {
-      return apiError(400, 'Total does not match')
+    const admin = await createAdminClient()
+
+    // --- Server-side price verification ---
+    const itemIds = [...new Set(items.map((i) => i.menuItemId))]
+    const variantIds = [...new Set(items.filter((i) => i.variantId).map((i) => i.variantId!))]
+
+    const [{ data: menuItems }, { data: menuVariants }] = await Promise.all([
+      (admin as any).from('menu_items').select('id, base_price').in('id', itemIds),
+      variantIds.length > 0
+        ? (admin as any).from('menu_variants').select('id, price').in('id', variantIds)
+        : Promise.resolve({ data: [] }),
+    ])
+
+    const itemPriceMap = new Map<string, number>(
+      (menuItems ?? []).map((m: { id: string; base_price: number }) => [m.id, Number(m.base_price)])
+    )
+    const variantPriceMap = new Map<string, number>(
+      (menuVariants ?? []).map((v: { id: string; price: number }) => [v.id, Number(v.price)])
+    )
+
+    for (const item of items) {
+      const dbPrice = item.variantId
+        ? variantPriceMap.get(item.variantId)
+        : itemPriceMap.get(item.menuItemId)
+
+      if (dbPrice === undefined) return apiError(400, 'Menu item not found')
+      if (Math.abs(dbPrice - item.unitPrice) > 0.01) return apiError(400, 'Item price mismatch')
     }
 
-    const admin = await createAdminClient()
+    // --- Validate delivery fee against business rules ---
+    const expectedDeliveryFee = orderType === 'delivery' ? DELIVERY_FEE : 0
+    if (Math.abs(deliveryFee - expectedDeliveryFee) > 0.01) {
+      return apiError(400, 'Invalid delivery fee')
+    }
+
+    // --- Server-side promo code validation ---
+    let verifiedDiscount = 0
+    if (promoCode) {
+      const upper = promoCode.toUpperCase()
+      const now = new Date().toISOString()
+      const { data: pc } = await (admin as any)
+        .from('promo_codes')
+        .select('*')
+        .eq('code', upper)
+        .eq('is_active', true)
+        .single()
+
+      if (!pc) return apiError(400, 'Invalid or inactive promo code')
+      if (pc.valid_from && pc.valid_from > now) return apiError(400, 'Promo code is not yet active')
+      if (pc.valid_until && pc.valid_until < now) return apiError(400, 'Promo code has expired')
+      if (pc.max_uses != null && pc.used_count >= pc.max_uses) {
+        return apiError(400, 'Promo code has been fully redeemed')
+      }
+      if (pc.min_order != null && calculatedSubtotal < Number(pc.min_order)) {
+        return apiError(400, `Minimum order of £${Number(pc.min_order).toFixed(2)} required`)
+      }
+
+      verifiedDiscount = pc.type === 'percent'
+        ? Math.round((calculatedSubtotal * Number(pc.value)) / 100 * 100) / 100
+        : Math.min(Number(pc.value), calculatedSubtotal)
+    }
+
+    // Verify the client total against server-computed values
+    const verifiedTotal = Math.max(0, calculatedSubtotal + expectedDeliveryFee - verifiedDiscount)
+    if (Math.abs(verifiedTotal - total) > 0.01) {
+      return apiError(400, 'Total does not match')
+    }
 
     if (orderType === 'delivery' && deliveryAddress) {
       const { data: valid } = await (admin.rpc as any)('is_valid_delivery_postcode', {
@@ -84,10 +148,10 @@ export async function POST(request: NextRequest) {
         delivery_line2: deliveryAddress?.line2 ?? null,
         delivery_city: deliveryAddress?.city ?? null,
         delivery_postcode: deliveryAddress?.postcode ?? null,
-        subtotal,
-        delivery_fee: deliveryFee,
-        discount,
-        total,
+        subtotal: calculatedSubtotal,
+        delivery_fee: expectedDeliveryFee,
+        discount: verifiedDiscount,
+        total: verifiedTotal,
         payment_method: paymentMethod,
         customer_notes: customerNotes ?? null,
         estimated_time: orderType === 'delivery' ? 45 : 20,
@@ -120,7 +184,7 @@ export async function POST(request: NextRequest) {
       status: 'pending',
     })
 
-    if (promoCode && discount > 0) {
+    if (promoCode && verifiedDiscount > 0) {
       const upper = promoCode.toUpperCase()
       const { data: pc } = await (admin as any)
         .from('promo_codes')
@@ -138,40 +202,46 @@ export async function POST(request: NextRequest) {
 
     ;(async () => {
       try {
-        await Promise.all([
-          sendOrderConfirmation({
-            email: contact.email,
-            customerName: contact.name,
-            orderNumber,
-            orderType,
-            items: items.map((i) => ({
-              name: i.name,
-              quantity: i.quantity,
-              total_price: i.unitPrice * i.quantity,
-              variant_label: i.variantLabel,
-              options: i.options,
-            })),
-            subtotal,
-            deliveryFee,
-            total,
-            estimatedTime: orderType === 'delivery' ? 45 : 20,
-            paymentMethod,
-            deliveryAddress: deliveryAddress ?? null,
-            customerNotes: customerNotes ?? null,
-          }),
-          sendAdminNewOrderAlert({
-            orderNumber,
-            customerName: contact.name,
-            orderType,
-            total,
-            items: items.map((i) => ({
-              name: i.name,
-              quantity: i.quantity,
-              total_price: i.unitPrice * i.quantity,
-            })),
-            customerNotes: customerNotes ?? null,
-            deliveryAddress: deliveryAddress ?? null,
-          }),
+        const emailTimeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Email send timeout')), 8000)
+        )
+        await Promise.race([
+          Promise.all([
+            sendOrderConfirmation({
+              email: contact.email,
+              customerName: contact.name,
+              orderNumber,
+              orderType,
+              items: items.map((i) => ({
+                name: i.name,
+                quantity: i.quantity,
+                total_price: i.unitPrice * i.quantity,
+                variant_label: i.variantLabel,
+                options: i.options,
+              })),
+              subtotal: calculatedSubtotal,
+              deliveryFee: expectedDeliveryFee,
+              total: verifiedTotal,
+              estimatedTime: orderType === 'delivery' ? 45 : 20,
+              paymentMethod,
+              deliveryAddress: deliveryAddress ?? null,
+              customerNotes: customerNotes ?? null,
+            }),
+            sendAdminNewOrderAlert({
+              orderNumber,
+              customerName: contact.name,
+              orderType,
+              total: verifiedTotal,
+              items: items.map((i) => ({
+                name: i.name,
+                quantity: i.quantity,
+                total_price: i.unitPrice * i.quantity,
+              })),
+              customerNotes: customerNotes ?? null,
+              deliveryAddress: deliveryAddress ?? null,
+            }),
+          ]),
+          emailTimeout,
         ])
       } catch (emailErr) {
         console.error('Failed to send order emails:', emailErr)

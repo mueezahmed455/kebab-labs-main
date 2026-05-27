@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { createPaymentIntentSchema } from '@/lib/validations'
 import { apiError, apiSuccess } from '@/lib/api-error'
 import { rateLimit } from '@/lib/rate-limit'
-import { createAdminClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,17 +20,29 @@ export async function POST(request: NextRequest) {
 
     const { orderId } = parsed.data
 
-    // Look up the order to verify the amount server-side
-    const admin = await createAdminClient()
+    const [supabase, admin] = await Promise.all([createClient(), createAdminClient()])
+    const { data: { user } } = await supabase.auth.getUser()
+
     const { data: order } = await (admin as any)
       .from('orders')
-      .select('total')
+      .select('total, user_id, payment_status')
       .eq('id', orderId)
       .single()
 
     if (!order) return apiError(404, 'Order not found')
 
+    // Prevent paying for already-paid orders
+    if (order.payment_status === 'paid') {
+      return apiError(400, 'Order has already been paid')
+    }
+
+    // If the order belongs to a specific user, verify the requester owns it
+    if (order.user_id && (!user || user.id !== order.user_id)) {
+      return apiError(403, 'Not authorised to pay for this order')
+    }
+
     const amountInPence = Math.round(order.total * 100)
+    if (amountInPence < 30) return apiError(400, 'Order total is too low')
 
     const stripe = await import('@/lib/stripe').then((m) => m.stripe)
 

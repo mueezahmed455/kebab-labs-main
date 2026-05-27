@@ -9,13 +9,29 @@ async function getAdminUser() {
   return (profile as { role: string } | null)?.role === 'admin' ? user : null
 }
 
+function isValidISODate(str: string): boolean {
+  const d = new Date(str)
+  return !isNaN(d.getTime())
+}
+
 export async function GET(request: NextRequest) {
   const user = await getAdminUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
 
   const { searchParams } = new URL(request.url)
-  const from = searchParams.get('from') ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-  const to   = searchParams.get('to')   ?? new Date().toISOString()
+  const fromParam = searchParams.get('from') ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  const toParam   = searchParams.get('to')   ?? new Date().toISOString()
+
+  if (!isValidISODate(fromParam) || !isValidISODate(toParam)) {
+    return NextResponse.json({ error: 'Invalid date parameters' }, { status: 400 })
+  }
+
+  const from = new Date(fromParam).toISOString()
+  const to   = new Date(toParam).toISOString()
+
+  if (new Date(from) > new Date(to)) {
+    return NextResponse.json({ error: 'from must be before to' }, { status: 400 })
+  }
 
   const admin = await createAdminClient()
   const { data, error } = await admin

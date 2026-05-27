@@ -32,38 +32,46 @@ export async function POST(request: NextRequest) {
 
         const { data: order } = await (admin as any)
           .from('orders')
-          .select('total, guest_email, guest_name, order_number, estimated_time, order_type')
+          .select('total, guest_email, guest_name, order_number, estimated_time, order_type, payment_status')
           .eq('id', orderId)
           .single()
 
-        if (order && Math.round(order.total * 100) === amountPaid) {
-          await (admin as any)
-            .from('orders')
-            .update({
-              payment_status: 'paid',
-              status: 'confirmed',
-              confirmed_at: new Date().toISOString(),
-              stripe_payment_intent: pi.id,
-            })
-            .eq('id', orderId)
+        if (!order) break
 
-          await (admin as any).from('order_status_history').insert({
-            order_id: orderId,
+        // Idempotency: skip if already processed
+        if (order.payment_status === 'paid') break
+
+        if (Math.round(order.total * 100) !== amountPaid) {
+          console.error(`Webhook amount mismatch for order ${orderId}: expected ${Math.round(order.total * 100)}, got ${amountPaid}`)
+          break
+        }
+
+        await (admin as any)
+          .from('orders')
+          .update({
+            payment_status: 'paid',
             status: 'confirmed',
-            note: 'Payment confirmed automatically via Stripe',
+            confirmed_at: new Date().toISOString(),
+            stripe_payment_intent: pi.id,
           })
+          .eq('id', orderId)
 
-          if (order.guest_email) {
-            const { sendOrderStatusUpdate } = await import('@/lib/resend')
-            await sendOrderStatusUpdate({
-              email: order.guest_email as string,
-              customerName: (order.guest_name as string) || 'Customer',
-              orderNumber: order.order_number as string,
-              status: 'confirmed',
-              estimatedTime: order.estimated_time as number | null,
-              orderType: order.order_type as string,
-            }).catch(() => {})
-          }
+        await (admin as any).from('order_status_history').insert({
+          order_id: orderId,
+          status: 'confirmed',
+          note: 'Payment confirmed automatically via Stripe',
+        })
+
+        if (order.guest_email) {
+          const { sendOrderStatusUpdate } = await import('@/lib/resend')
+          await sendOrderStatusUpdate({
+            email: order.guest_email as string,
+            customerName: (order.guest_name as string) || 'Customer',
+            orderNumber: order.order_number as string,
+            status: 'confirmed',
+            estimatedTime: order.estimated_time as number | null,
+            orderType: order.order_type as string,
+          }).catch(() => {})
         }
         break
       }

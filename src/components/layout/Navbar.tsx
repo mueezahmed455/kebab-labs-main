@@ -185,7 +185,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 35, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-80 bg-brand-bg border-l border-brand-border lg:hidden flex flex-col pt-24 px-8 gap-4"
+              className="fixed top-0 right-0 bottom-0 z-50 w-80 bg-brand-bg border-l border-brand-border lg:hidden flex flex-col pt-24 px-8 gap-4 pb-[4.5rem]"
             >
               <div className="mb-8">
                 <p className="text-brand-gold text-[10px] font-semibold uppercase tracking-[0.25em] mb-2">Navigation</p>
@@ -197,9 +197,17 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    'flex items-center py-4 text-2xl font-display italic tracking-wide transition-colors',
-                    pathname === link.href ? 'text-brand-gold' : 'text-brand-text hover:text-brand-gold'
+                    'flex items-center py-5 text-2xl font-display italic tracking-wide transition-colors duration-200',
+                    pathname === link.href ? 'text-brand-gold' : 'text-brand-text hover:text-brand-gold hover:bg-brand-surface/10'
                   )}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLElement
+                    el.style.backgroundColor = 'color-mix(in srgb, var(--color-brand-surface) 10%, transparent)'
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLElement
+                    el.style.backgroundColor = 'transparent'
+                  }}
                 >
                   {link.label}
                 </Link>
@@ -223,7 +231,7 @@ export function Navbar() {
       </AnimatePresence>
 
       {/* Spacer */}
-      <div className={cn('transition-all duration-500', scrolled ? 'h-20' : 'h-24')} />
+      <div className={cn('transition-all duration-500', scrolled ? 'h-20' : 'h-[calc(24px+4.5rem)]')} />
     </>
   )
 }

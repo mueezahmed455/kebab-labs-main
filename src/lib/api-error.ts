@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server'
 
 export function apiError(status: number, message: string, details?: unknown) {
   return NextResponse.json(
-    { error: message, details },
+    {
+      error: message,
+      ...(process.env.NODE_ENV !== 'production' && details !== undefined ? { details } : {}),
+    },
     { status }
   )
 }

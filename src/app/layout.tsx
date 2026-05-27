@@ -4,6 +4,7 @@ import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { CartDrawer } from '@/components/cart/CartDrawer'
+import { BottomTabBar } from '@/components/layout/BottomTabBar'
 import { ThemeProvider } from '@/lib/theme-provider'
 import { Toaster } from 'sonner'
 import { BRAND } from '@/lib/data/brand'
@@ -113,6 +114,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <Footer />
           <CartDrawer />
+          <BottomTabBar />
           <a
             href={`https://wa.me/44${BRAND.phoneRaw.replace(/^0/, '')}`}
             target="_blank"
