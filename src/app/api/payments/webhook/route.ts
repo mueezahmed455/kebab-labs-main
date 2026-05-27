@@ -27,22 +27,43 @@ export async function POST(request: NextRequest) {
       case 'payment_intent.succeeded': {
         const pi = event.data.object
         const amountPaid = pi.amount_received
-
-        // Verify amount-received matches stored order total
         const orderId = pi.metadata?.order_id
         if (!orderId) break
 
         const { data: order } = await (admin as any)
           .from('orders')
-          .select('total')
+          .select('total, guest_email, guest_name, order_number, estimated_time, order_type')
           .eq('id', orderId)
           .single()
 
         if (order && Math.round(order.total * 100) === amountPaid) {
           await (admin as any)
             .from('orders')
-            .update({ payment_status: 'paid', stripe_payment_intent: pi.id })
+            .update({
+              payment_status: 'paid',
+              status: 'confirmed',
+              confirmed_at: new Date().toISOString(),
+              stripe_payment_intent: pi.id,
+            })
             .eq('id', orderId)
+
+          await (admin as any).from('order_status_history').insert({
+            order_id: orderId,
+            status: 'confirmed',
+            note: 'Payment confirmed automatically via Stripe',
+          })
+
+          if (order.guest_email) {
+            const { sendOrderStatusUpdate } = await import('@/lib/resend')
+            await sendOrderStatusUpdate({
+              email: order.guest_email as string,
+              customerName: (order.guest_name as string) || 'Customer',
+              orderNumber: order.order_number as string,
+              status: 'confirmed',
+              estimatedTime: order.estimated_time as number | null,
+              orderType: order.order_type as string,
+            }).catch(() => {})
+          }
         }
         break
       }

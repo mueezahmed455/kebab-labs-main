@@ -31,7 +31,7 @@ function emailLayout({ title, preview, children }: EmailLayoutProps): string {
                       <span style="font-size:28px;">🔥</span>
                     </div>
                     <h1 style="margin:0;font-size:28px;font-weight:800;color:#f5f0eb;letter-spacing:1px;">THE KEBAB LAB</h1>
-                    <p style="margin:4px 0 0;color:#a3e635;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;">Clay Oven Specialist</p>
+                    <p style="margin:4px 0 0;color:#0f9b5e;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;">Clay Oven Specialist</p>
                   </td>
                 </tr>
               </table>
@@ -155,7 +155,7 @@ export function orderConfirmationHtml(params: {
             <div style="width:56px;height:56px;border-radius:50%;background:rgba(163,230,53,0.12);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
               <span style="font-size:24px;">✅</span>
             </div>
-            <h2 style="margin:0 0 4px;color:#a3e635;font-size:22px;font-weight:700;">Order Confirmed!</h2>
+            <h2 style="margin:0 0 4px;color:#0f9b5e;font-size:22px;font-weight:700;">Order Confirmed!</h2>
             <p style="margin:0;color:#9c9288;font-size:14px;">Thanks for your order, ${customerName} 🙌</p>
           </td>
         </tr>
@@ -218,7 +218,7 @@ export function orderConfirmationHtml(params: {
         </tr>
         <tr>
           <td align="center" style="padding:32px 0 8px;">
-            <a href="https://thekebablabonline.co.uk/track/${orderNumber}" style="display:inline-block;padding:14px 36px;background:#a3e635;color:#08080e;text-decoration:none;border-radius:12px;font-size:14px;font-weight:700;letter-spacing:0.5px;">Track Your Order →</a>
+            <a href="https://thekebablabonline.co.uk/track/${orderNumber}" style="display:inline-block;padding:14px 36px;background:#0f9b5e;color:#08080e;text-decoration:none;border-radius:12px;font-size:14px;font-weight:700;letter-spacing:0.5px;">Track Your Order →</a>
           </td>
         </tr>
       </table>
@@ -229,11 +229,11 @@ export function orderConfirmationHtml(params: {
 /* ── Order Status Update ───────────────────────────────────── */
 
 const STATUS_META: Record<string, { icon: string; color: string; title: string }> = {
-  confirmed: { icon: '✅', color: '#a3e635', title: 'Order Confirmed' },
+  confirmed: { icon: '✅', color: '#0f9b5e', title: 'Order Confirmed' },
   preparing: { icon: '👨‍🍳', color: '#d4a54a', title: 'Being Prepared' },
-  ready: { icon: '📦', color: '#a3e635', title: 'Ready for Collection' },
+  ready: { icon: '📦', color: '#0f9b5e', title: 'Ready for Collection' },
   out_for_delivery: { icon: '🚚', color: '#d4a54a', title: 'Out for Delivery' },
-  delivered: { icon: '🎉', color: '#a3e635', title: 'Delivered!' },
+  delivered: { icon: '🎉', color: '#0f9b5e', title: 'Delivered!' },
   cancelled: { icon: '❌', color: '#b81c1c', title: 'Cancelled' },
 }
 
@@ -324,7 +324,7 @@ export function orderStatusHtml(params: {
         </tr>
         <tr>
           <td align="center" style="padding:24px 0 8px;">
-            <a href="https://thekebablabonline.co.uk/track/${orderNumber}" style="display:inline-block;padding:14px 36px;background:#a3e635;color:#08080e;text-decoration:none;border-radius:12px;font-size:14px;font-weight:700;letter-spacing:0.5px;">Track Live →</a>
+            <a href="https://thekebablabonline.co.uk/track/${orderNumber}" style="display:inline-block;padding:14px 36px;background:#0f9b5e;color:#08080e;text-decoration:none;border-radius:12px;font-size:14px;font-weight:700;letter-spacing:0.5px;">Track Live →</a>
           </td>
         </tr>
       </table>

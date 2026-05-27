@@ -15,13 +15,22 @@ export interface CheckoutForm {
   privacyConsent: boolean
 }
 
+interface PromoState {
+  code: string
+  discount: number
+  label: string
+}
+
 interface CheckoutStore {
   step: 1 | 2 | 3
   form: CheckoutForm
   orderReference: string
+  promo: PromoState | null
   setStep: (step: 1 | 2 | 3) => void
   updateForm: (fields: Partial<CheckoutForm>) => void
   setOrderReference: (ref: string) => void
+  setPromo: (promo: PromoState) => void
+  clearPromo: () => void
   reset: () => void
 }
 
@@ -44,12 +53,15 @@ export const useCheckout = create<CheckoutStore>()(
       step: 1,
       form: defaultForm,
       orderReference: '',
+      promo: null,
 
       setStep: (step) => set({ step }),
       updateForm: (fields) =>
         set((state) => ({ form: { ...state.form, ...fields } })),
       setOrderReference: (ref) => set({ orderReference: ref }),
-      reset: () => set({ step: 1, form: defaultForm, orderReference: '' }),
+      setPromo: (promo) => set({ promo }),
+      clearPromo: () => set({ promo: null }),
+      reset: () => set({ step: 1, form: defaultForm, orderReference: '', promo: null }),
     }),
     { name: 'kebab-lab-checkout', skipHydration: true }
   )

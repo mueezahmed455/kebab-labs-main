@@ -1,11 +1,11 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, ArrowRight, MapPin, CreditCard, Banknote, AlertCircle, Loader2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, MapPin, CreditCard, Banknote, AlertCircle, Loader2, Tag, X, CheckCircle2 } from 'lucide-react'
 import { useCart } from '@/lib/store/cartStore'
 import { useCheckout } from '@/lib/store/checkoutStore'
 import { formatCurrency } from '@/lib/utils/formatting'
@@ -52,15 +52,80 @@ function Input({ error, ...props }: React.InputHTMLAttributes<HTMLInputElement> 
   )
 }
 
+function PromoCodeInput({ subtotal }: { subtotal: number }) {
+  const { setPromo } = useCheckout()
+  const [code, setCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleApply = async () => {
+    if (!code.trim()) return
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code.trim(), subtotal }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Invalid promo code')
+        return
+      }
+      setPromo({ code: data.code, discount: data.discount, label: data.label })
+      toast.success(`Promo applied — ${data.label} saved!`)
+    } catch {
+      setError('Could not validate code. Try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <input
+          value={code}
+          onChange={(e) => { setCode(e.target.value.toUpperCase()); setError('') }}
+          onKeyDown={(e) => e.key === 'Enter' && handleApply()}
+          placeholder="Enter promo code"
+          maxLength={20}
+          className="flex-1 px-4 py-2.5 rounded-xl bg-brand-surface border border-brand-border text-brand-text text-sm placeholder:text-brand-dim focus:outline-none focus:border-brand-gold/40 transition-colors uppercase tracking-wider"
+        />
+        <button
+          type="button"
+          onClick={handleApply}
+          disabled={loading || !code.trim()}
+          className="px-4 py-2.5 rounded-xl bg-brand-gold/15 border border-brand-gold/25 text-brand-gold text-sm font-medium hover:bg-brand-gold/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+        </button>
+      </div>
+      {error && (
+        <p className="flex items-center gap-1 text-red-400 text-xs">
+          <AlertCircle className="w-3 h-3 flex-shrink-0" /> {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, subtotal, total, deliveryFee, orderType, clearCart } = useCart()
-  const { step, form, setStep, updateForm, reset } = useCheckout()
+  const { items, subtotal, total: cartTotal, deliveryFee, orderType, clearCart } = useCart()
+  const { step, form, promo, setStep, updateForm, clearPromo, reset } = useCheckout()
   const [placing, setPlacing] = useState(false)
+  const hasHydrated = useRef(false)
 
   const sub = subtotal()
   const fee = deliveryFee()
-  const tot = total()
+  const discount = promo?.discount ?? 0
+  const tot = Math.max(0, sub + fee - discount)
+
+  useEffect(() => {
+    hasHydrated.current = true
+  }, [])
 
   useEffect(() => {
     if (items.length === 0) router.replace('/menu')
@@ -98,9 +163,11 @@ export default function CheckoutPage() {
         })),
         subtotal: sub,
         deliveryFee: fee,
+        discount,
         total: tot,
         paymentMethod: form.payment,
         customerNotes: form.notes || undefined,
+        promoCode: promo?.code || undefined,
         privacyConsent: true as const,
       }
 
@@ -113,10 +180,9 @@ export default function CheckoutPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to place order')
 
-      const orderNumber = data.order_number
       clearCart()
       reset()
-      router.push(`/order/confirmation/${orderNumber}`)
+      router.push(`/order/confirmation/${data.order_number}`)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {
@@ -138,7 +204,7 @@ export default function CheckoutPage() {
         </button>
 
         <div className="mb-8 text-center">
-          <h1 className="font-display text-4xl text-brand-text tracking-wider mb-1">CHECKOUT</h1>
+          <h1 className="font-display italic text-4xl text-brand-text tracking-tight mb-1">Checkout</h1>
           <p className="text-brand-muted text-sm">
             You&apos;re almost there —{' '}
             <span className="text-brand-green">fill in your details below.</span>
@@ -223,7 +289,7 @@ export default function CheckoutPage() {
                 type="submit"
                 className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-brand-green text-brand-bg font-bold text-sm hover:bg-brand-green-dark transition-all active:scale-95"
               >
-                Continue — Review & Pay <ArrowRight className="w-4 h-4" />
+                Continue — Review &amp; Pay <ArrowRight className="w-4 h-4" />
               </button>
             </motion.form>
           )}
@@ -237,6 +303,7 @@ export default function CheckoutPage() {
               transition={{ duration: 0.25 }}
               className="space-y-4"
             >
+              {/* Order Summary */}
               <div className="bg-brand-card border border-brand-border rounded-2xl p-5 space-y-3">
                 <p className="text-brand-muted text-xs font-medium tracking-widest uppercase">Order Summary</p>
                 {items.map((item) => (
@@ -255,13 +322,47 @@ export default function CheckoutPage() {
                       {orderType === 'collection' ? 'Free' : fee === 0 ? 'Free' : formatCurrency(fee)}
                     </span>
                   </div>
-                  <div className="flex justify-between font-bold text-brand-text">
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-brand-gold flex items-center gap-1">
+                        <Tag className="w-3 h-3" /> {promo?.code}
+                      </span>
+                      <span className="text-brand-gold">−{formatCurrency(discount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold text-brand-text pt-1 border-t border-brand-border">
                     <span>Total</span>
-                    <span className="font-display text-xl text-brand-gold">{formatCurrency(tot)}</span>
+                    <span className="font-display italic text-xl text-brand-gold">{formatCurrency(tot)}</span>
                   </div>
                 </div>
               </div>
 
+              {/* Promo Code */}
+              <div className="bg-brand-card border border-brand-border rounded-2xl p-5">
+                <p className="text-brand-muted text-xs font-medium tracking-widest uppercase mb-3 flex items-center gap-2">
+                  <Tag className="w-3.5 h-3.5" /> Promo Code
+                </p>
+                {promo ? (
+                  <div className="flex items-center justify-between py-1">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-brand-green flex-shrink-0" />
+                      <span className="text-brand-green text-sm font-semibold">{promo.code}</span>
+                      <span className="text-brand-muted text-xs">({promo.label})</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={clearPromo}
+                      className="text-brand-dim hover:text-brand-text transition-colors p-1"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <PromoCodeInput subtotal={sub} />
+                )}
+              </div>
+
+              {/* Privacy consent */}
               <label className="flex items-start gap-3 bg-brand-card border border-brand-border rounded-2xl p-4 cursor-pointer">
                 <input
                   type="checkbox"
@@ -278,6 +379,7 @@ export default function CheckoutPage() {
                 </div>
               </label>
 
+              {/* Payment Method */}
               <div className="bg-brand-card border border-brand-border rounded-2xl p-5 space-y-3">
                 <p className="text-brand-muted text-xs font-medium tracking-widest uppercase">Payment Method</p>
                 <div className="grid grid-cols-2 gap-2">

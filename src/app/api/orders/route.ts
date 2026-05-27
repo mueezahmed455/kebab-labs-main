@@ -44,11 +44,16 @@ export async function POST(request: NextRequest) {
       return apiError(400, 'Validation failed', parsed.error.flatten())
     }
 
-    const { orderType, contact, deliveryAddress, items, subtotal, deliveryFee, total, paymentMethod, customerNotes } = parsed.data
+    const { orderType, contact, deliveryAddress, items, subtotal, deliveryFee, total, paymentMethod, customerNotes, promoCode, discount = 0 } = parsed.data
 
     const calculatedSubtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
     if (Math.abs(calculatedSubtotal - subtotal) > 0.01) {
       return apiError(400, 'Subtotal does not match item prices')
+    }
+
+    const expectedTotal = Math.max(0, calculatedSubtotal + deliveryFee - discount)
+    if (Math.abs(expectedTotal - total) > 0.01) {
+      return apiError(400, 'Total does not match')
     }
 
     const admin = await createAdminClient()
@@ -81,6 +86,7 @@ export async function POST(request: NextRequest) {
         delivery_postcode: deliveryAddress?.postcode ?? null,
         subtotal,
         delivery_fee: deliveryFee,
+        discount,
         total,
         payment_method: paymentMethod,
         customer_notes: customerNotes ?? null,
@@ -113,6 +119,22 @@ export async function POST(request: NextRequest) {
       order_id: order.id,
       status: 'pending',
     })
+
+    if (promoCode && discount > 0) {
+      const upper = promoCode.toUpperCase()
+      const { data: pc } = await (admin as any)
+        .from('promo_codes')
+        .select('used_count')
+        .eq('code', upper)
+        .single()
+      if (pc) {
+        await (admin as any)
+          .from('promo_codes')
+          .update({ used_count: (pc.used_count ?? 0) + 1 })
+          .eq('code', upper)
+          .catch(() => {})
+      }
+    }
 
     ;(async () => {
       try {

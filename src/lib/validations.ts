@@ -51,6 +51,7 @@ export const createOrderSchema = z.object({
   paymentMethod: z.enum(['card', 'cash']),
   customerNotes: z.string().max(1000).optional(),
   promoCode: z.string().optional(),
+  discount: z.number().min(0).optional(),
   privacyConsent: z.literal(true, { message: 'You must accept the privacy policy' }),
 })
 

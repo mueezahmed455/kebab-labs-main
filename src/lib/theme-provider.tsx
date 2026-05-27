@@ -15,9 +15,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem('kebab-lab-theme') as Theme | null
-    const preferred = stored ?? (window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark')
-    setTheme(preferred)
+    const current = document.documentElement.classList.contains('light') ? 'light' : 'dark'
+    setTheme(current)
     setReady(true)
   }, [])
 
@@ -29,7 +28,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('kebab-lab-theme', theme)
   }, [theme, ready])
 
-  const toggle = useCallback(() => setTheme((t) => (t === 'dark' ? 'light' : 'dark')), [])
+  const toggle = useCallback(() => {
+    setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+  }, [])
 
   return (
     <ThemeContext.Provider value={{ theme, toggle }}>

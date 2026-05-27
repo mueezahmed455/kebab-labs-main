@@ -4,6 +4,7 @@ import { FeaturesBar } from '@/components/home/FeaturesBar'
 import { CategoryGrid } from '@/components/home/CategoryGrid'
 import { PopularItems } from '@/components/home/PopularItems'
 import { WhyUs } from '@/components/home/WhyUs'
+import { Testimonials } from '@/components/home/Testimonials'
 import { PageTransition } from '@/components/common/PageTransition'
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function HomePage() {
       <FeaturesBar />
       <CategoryGrid />
       <PopularItems />
+      <Testimonials />
       <WhyUs />
     </PageTransition>
   )

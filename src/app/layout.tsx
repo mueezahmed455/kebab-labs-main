@@ -58,7 +58,10 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#07080f',
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0b0b0b' },
+    { media: '(prefers-color-scheme: light)', color: '#f5f3f0' },
+  ],
   width: 'device-width',
   initialScale: 1,
 }
@@ -96,6 +99,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `(function(){try{var t=localStorage.getItem('kebab-lab-theme');if(!t){t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'}document.documentElement.classList.add(t)}catch(e){document.documentElement.classList.add('dark')}})()`
+        }} />
         <script type="application/ld+json" suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
         />

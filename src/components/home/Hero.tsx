@@ -62,6 +62,7 @@ export function Hero() {
             src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=1400&auto=format&fit=crop&q=90"
             alt="Charcoal-grilled kebab skewers over open flame"
             fill
+            sizes="55vw"
             className="object-cover object-center"
             priority
           />
@@ -254,7 +255,7 @@ export function Hero() {
       {/* Mobile food image */}
       <div className="lg:hidden relative mx-4 mb-8 h-[280px] sm:h-[360px] rounded-[2rem] overflow-hidden subtle-texture">
         <Image src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=900&auto=format&fit=crop&q=90"
-          alt="Charcoal-grilled kebab" fill className="object-cover" priority />
+          alt="Charcoal-grilled kebab" fill sizes="calc(100vw - 32px)" className="object-cover" priority />
         <div className="absolute inset-0"
           style={{ background: 'linear-gradient(to top, rgba(7,4,2,0.85) 0%, rgba(7,4,2,0.1) 50%, transparent 75%)' }} />
         <div className="absolute inset-0" style={{ border: '1px solid rgba(201,149,58,0.15)', borderRadius: '2rem' }} />
