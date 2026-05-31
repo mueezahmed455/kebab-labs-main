@@ -144,7 +144,7 @@ export default function DealsPage() {
                         key={item.name}
                         className="flex items-center justify-between px-5 py-3.5 transition-colors duration-150"
                         onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = 'var(--color-brand-card-hover)'
+                          (e.currentTarget as HTMLElement).style.background = 'var(--color-brand-hover)'
                         }}
                         onMouseLeave={(e) => {
                           (e.currentTarget as HTMLElement).style.background = ''

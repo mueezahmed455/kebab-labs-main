@@ -5,7 +5,6 @@ import Link from 'next/link'
 import anime from 'animejs'
 import { motion, useScroll, useTransform, type Variants } from 'framer-motion'
 import { ArrowRight, Star, Clock, ShieldCheck, MapPin } from 'lucide-react'
-import { FoodParticles } from '@/components/common/FoodParticles'
 import { BLUR_PLACEHOLDER } from '@/lib/utils/blur'
 
 const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number]
@@ -117,7 +116,7 @@ export function Hero() {
         className="absolute top-0 right-0 bottom-0 w-[52vw] hidden lg:block"
       >
         <Image
-          src="https://cdn.pixabay.com/photo/2017/08/28/19/56/shish-kebab-2692018_1280.jpg"
+          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=800&fit=crop&q=80"
           alt="Charcoal-grilled kebab skewers over glowing coals"
           fill
           sizes="52vw"
@@ -324,7 +323,6 @@ export function Hero() {
           style={{ y: textY }}
           className="hidden lg:flex items-center self-stretch"
         >
-          <FoodParticles />
         </motion.div>
 
         </div>{/* end flex row */}
@@ -333,7 +331,7 @@ export function Hero() {
       {/* ── Mobile food image ─────────────────────────── */}
       <div className="lg:hidden relative mx-4 mb-8 h-[280px] sm:h-[360px] rounded-[2rem] overflow-hidden">
         <Image
-          src="https://cdn.pixabay.com/photo/2017/08/28/19/56/shish-kebab-2692018_1280.jpg"
+          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=800&fit=crop&q=80"
           alt="Charcoal-grilled kebab"
           fill
           sizes="calc(100vw - 32px)"

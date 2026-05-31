@@ -2,38 +2,35 @@
 
 @theme {
   /* ── Dark mode (default) ───────────────────────────── */
-  --color-brand-bg:         #0b0b0b;
-  --color-brand-card:       #141414;
-  --color-brand-card-hover: #1c1c1c;
-  --color-brand-surface:    #1a1a1a;
-  --color-brand-border:     #282828;
-  --color-brand-border-light:#353535;
-  --color-brand-text:       #f5f5f5;
-  --color-brand-muted:      #999999;
-  --color-brand-dim:        #666666;
-  --color-brand-green:      #25a06a;
-  --color-brand-green-dark: #1d8556;
-  --color-brand-green-light:#30ba7c;
-  --color-brand-gold:       #d4a44a;
-  --color-brand-gold-dark:  #b88832;
-  --color-brand-gold-light: #e0b86a;
-  --color-brand-fire:       #e06030;
-  --color-brand-fire-dark:  #c84d20;
-  --color-brand-fire-light: #ee7848;
-  --color-brand-spice:      #d03030;
-  --color-brand-amber:      #d4872a;
-  --color-brand-copper:     #c07030;
-  --color-brand-glow:       rgba(224,96,48,0.07);
-  --color-brand-glow-gold:  rgba(212,164,74,0.09);
-  --color-brand-glow-green: rgba(37,160,106,0.07);
-  --color-brand-shadow:     rgba(0,0,0,0.95);
+  --color-brand-bg:        #080a0f;
+  --color-brand-surface:   #0f1218;
+  --color-brand-card:      #151a23;
+  --color-brand-border:    #1e2530;
+  --color-brand-hover:     #232b38;
+  --color-brand-text:      #e8e6e1;
+  --color-brand-muted:     #9a9590;
+  --color-brand-dim:       #5c5854;
+  --color-brand-fire:      #e85d26;
+  --color-brand-fire-dark: #c44a1a;
+  --color-brand-gold:      #d4a44a;
+  --color-brand-gold-light:#e8c06a;
+  --color-brand-green:     #25a06a;
+  --color-brand-green-dark:#1d8557;
+  --color-brand-green-light:#34c480;
+  --color-brand-red:       #dc3545;
+  --color-brand-white:     #ffffff;
+  --color-brand-dark:      #0a0c10;
+  --color-brand-glow:      rgba(232,93,38,0.06);
+  --color-brand-glow-gold: rgba(212,164,74,0.05);
 
   --font-display: var(--font-playfair);
   --font-sans:    var(--font-inter);
 
+  --gradient-fire-subtle:  linear-gradient(135deg, #e85d26 0%, #d4a44a 100%);
+  --gradient-gold-subtle: linear-gradient(135deg, #d4a44a 0%, #e8c06a 100%);
+
   --shadow-glow-fire:  0 0 50px var(--color-brand-glow);
   --shadow-glow-gold:  0 0 50px var(--color-brand-glow-gold);
-  --shadow-glow-green: 0 0 50px var(--color-brand-glow-green);
 
   --radius-sm:  0.375rem;
   --radius-md:  0.5rem;
@@ -49,29 +46,16 @@
 
 /* ── Light mode ──────────────────────────────────────── */
 .light {
-  --color-brand-bg:         #f5f3f0;
-  --color-brand-card:       #ffffff;
-  --color-brand-card-hover: #faf8f6;
-  --color-brand-surface:    #edebe8;
-  --color-brand-border:     #dbd7d2;
-  --color-brand-border-light:#cbc5be;
-  --color-brand-text:       #161616;
-  --color-brand-muted:      #707070;
-  --color-brand-dim:        #a0a0a0;
-  --color-brand-green:      #1a8a55;
-  --color-brand-green-dark: #157048;
-  --color-brand-green-light:#22a06a;
-  --color-brand-gold:       #b8883a;
-  --color-brand-gold-dark:  #9a702a;
-  --color-brand-gold-light: #d4a04a;
-  --color-brand-fire:       #cc4a28;
-  --color-brand-fire-dark:  #b03a1a;
-  --color-brand-fire-light: #e0552e;
-  --color-brand-spice:      #b02828;
-  --color-brand-glow:       rgba(204,74,40,0.06);
-  --color-brand-glow-gold:  rgba(184,136,58,0.08);
-  --color-brand-glow-green: rgba(26,138,85,0.06);
-  --color-brand-shadow:     rgba(0,0,0,0.04);
+  --color-brand-bg:        #f5f2ed;
+  --color-brand-surface:   #ffffff;
+  --color-brand-card:      #ffffff;
+  --color-brand-border:    #e0dbd4;
+  --color-brand-hover:     #f0ece6;
+  --color-brand-text:      #1a1714;
+  --color-brand-muted:     #5c564e;
+  --color-brand-dim:       #8a857e;
+  --color-brand-glow:      rgba(232,93,38,0.04);
+  --color-brand-glow-gold: rgba(212,164,74,0.03);
 }
 
 /* ── Base ────────────────────────────────────────────── */
@@ -88,15 +72,15 @@ body {
 
 ::selection { background: var(--color-brand-fire); color: #fff; }
 
-/* ── Scrollbar ───────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track  { background: #0b0b0b; }
-::-webkit-scrollbar-thumb  { border-radius: 4px; background: #282828; }
-::-webkit-scrollbar-thumb:hover { background: #d4a44a; }
+/* ── Scrollbar (refined) ─────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { border-radius: 4px; background: rgba(201,149,58,0.18); }
+::-webkit-scrollbar-thumb:hover { background: rgba(201,149,58,0.35); }
 
-.light ::-webkit-scrollbar-track  { background: #e8e4df; }
-.light ::-webkit-scrollbar-thumb  { background: #bbb5ae; }
-.light ::-webkit-scrollbar-thumb:hover { background: #b8883a; }
+.light ::-webkit-scrollbar-track  { background: transparent; }
+.light ::-webkit-scrollbar-thumb  { background: rgba(184,136,58,0.2); }
+.light ::-webkit-scrollbar-thumb:hover { background: rgba(184,136,58,0.35); }
 
 /* ── Glass ───────────────────────────────────────────── */
 .glass {
@@ -119,7 +103,7 @@ body {
 .light .glass-nav {
   background: color-mix(in srgb, var(--color-brand-card) 96%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--color-brand-fire) 8%, transparent);
-  box-shadow: 0 4px 24px var(--color-brand-shadow);
+  box-shadow: 0 4px 24px var(--color-brand-glow);
 }
 
 .glass-card {
@@ -131,7 +115,7 @@ body {
 /* ── Glows ───────────────────────────────────────────── */
 .glow-fire  { box-shadow: 0 0 40px var(--color-brand-glow); }
 .glow-gold  { box-shadow: 0 0 40px var(--color-brand-glow-gold); }
-.glow-green { box-shadow: 0 0 40px var(--color-brand-glow-green); }
+.glow-green { box-shadow: 0 0 40px var(--color-brand-glow); }
 
 /* ── Text gradients ──────────────────────────────────── */
 .text-gradient-fire {
