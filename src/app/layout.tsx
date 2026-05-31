@@ -8,6 +8,12 @@ import { BottomTabBar } from '@/components/layout/BottomTabBar'
 import { ThemeProvider } from '@/lib/theme-provider'
 import { Toaster } from 'sonner'
 import { BRAND } from '@/lib/data/brand'
+import { StoreHydrator } from '@/components/common/StoreHydrator'
+import { PWAInstallPrompt } from '@/components/common/PWAInstallPrompt'
+import { MobileFloatingCart } from '@/components/cart/MobileFloatingCart'
+import { BackToTop } from '@/components/common/BackToTop'
+import { PromoBanner } from '@/components/common/PromoBanner'
+import { QuickOrderFAB } from '@/components/common/QuickOrderFAB'
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -110,17 +116,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <div className="grain-overlay" aria-hidden="true" />
         <ThemeProvider>
+          <StoreHydrator />
+          <PWAInstallPrompt />
+          <MobileFloatingCart />
+          <PromoBanner />
           <Navbar />
-          <main>{children}</main>
+          <main className="pb-28 md:pb-0">{children}</main>
           <Footer />
           <CartDrawer />
           <BottomTabBar />
+          <BackToTop />
+          <QuickOrderFAB />
           <a
             href={`https://wa.me/44${BRAND.phoneRaw.replace(/^0/, '')}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Contact us on WhatsApp"
-            className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-transform hover:scale-110 active:scale-95"
+            className="fixed bottom-24 md:bottom-6 right-6 z-30 flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-transform hover:scale-110 active:scale-95"
             style={{ background: '#25D366' }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">

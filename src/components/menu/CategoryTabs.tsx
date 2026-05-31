@@ -3,6 +3,7 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import type { Category } from '@/types/menu'
 import { cn } from '@/lib/utils'
+import { CategoryIcon } from '@/components/ui/CategoryIcon'
 
 interface CategoryTabsProps {
   categories: Category[]
@@ -71,14 +72,21 @@ export function CategoryTabs({ categories, search, onSearchChange }: CategoryTab
                 role="tab"
                 aria-selected={activeId === cat.id}
                 onClick={() => handleTabClick(cat.id)}
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
+               className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 group',
                   activeId === cat.id
-                    ? 'bg-brand-green text-brand-dark'
+                    ? 'bg-brand-green text-brand-bg shadow-lg shadow-brand-green/10'
                     : 'bg-brand-card border border-brand-border text-brand-muted hover:text-brand-text hover:border-brand-green/30'
                 )}
               >
-                <span>{cat.icon}</span>
+                <CategoryIcon 
+                  id={cat.id} 
+                  size={15} 
+                  className={cn(
+                    "transition-transform duration-300 group-hover:scale-110",
+                    activeId === cat.id ? "text-brand-bg" : "text-brand-muted group-hover:text-brand-text"
+                  )} 
+                />
                 <span>{cat.name}</span>
               </button>
             ))}

@@ -8,6 +8,7 @@ import { useCart } from '@/lib/store/cartStore'
 import { formatCurrency } from '@/lib/utils/formatting'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { BLUR_PLACEHOLDER } from '@/lib/utils/blur'
 
 interface ItemModalProps {
   item: MenuItem | null
@@ -107,7 +108,7 @@ export function ItemModal({ item, category, onClose }: ItemModalProps) {
               >
                 {item.image ? (
                   <>
-                    <Image src={item.image} alt={item.name} fill sizes="448px" className="object-cover" priority />
+                    <Image src={item.image} alt={item.name} fill sizes="448px" placeholder="blur" blurDataURL={BLUR_PLACEHOLDER} className="object-cover" priority />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                   </>
                 ) : (

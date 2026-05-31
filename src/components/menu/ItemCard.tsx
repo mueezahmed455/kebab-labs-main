@@ -5,6 +5,7 @@ import { Plus, Star, Zap } from 'lucide-react'
 import type { MenuItem, Category } from '@/types/menu'
 import { formatCurrency } from '@/lib/utils/formatting'
 import { useCart } from '@/lib/store/cartStore'
+import { BLUR_PLACEHOLDER } from '@/lib/utils/blur'
 import { toast } from 'sonner'
 
 interface ItemCardProps {
@@ -50,6 +51,8 @@ export function ItemCard({ item, category, onOpenModal }: ItemCardProps) {
             alt={item.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            placeholder="blur"
+            blurDataURL={BLUR_PLACEHOLDER}
             className="object-cover transition-transform duration-[2s] group-hover:scale-110"
           />
         ) : (
@@ -90,9 +93,13 @@ export function ItemCard({ item, category, onOpenModal }: ItemCardProps) {
           <h3 className="text-brand-text font-bold text-base group-hover:text-brand-gold transition-colors duration-300 line-clamp-1">
             {item.name}
           </h3>
-          <div className="w-9 h-9 rounded-xl bg-brand-green/10 border border-brand-green/20 flex items-center justify-center group-hover:bg-brand-green group-hover:border-brand-green transition-all duration-300">
+          <motion.button 
+            whileTap={{ scale: 0.85 }}
+            type="button"
+            className="w-9 h-9 rounded-xl bg-brand-green/10 border border-brand-green/20 flex items-center justify-center group-hover:bg-brand-green group-hover:border-brand-green transition-all duration-300 focus:outline-none"
+          >
             <Plus className="w-4 h-4 text-brand-green group-hover:text-brand-dark transition-colors" />
-          </div>
+          </motion.button>
         </div>
         
         <p className="text-brand-dim text-xs leading-relaxed line-clamp-2 mb-4 group-hover:text-brand-muted transition-colors">

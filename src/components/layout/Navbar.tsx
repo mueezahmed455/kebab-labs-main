@@ -2,9 +2,10 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingCart, Menu, X, Moon, Sun, ShieldCheck } from 'lucide-react'
+import { ShoppingCart, Menu, X, Moon, Sun, ShieldCheck, Sparkles } from 'lucide-react'
 import { KebabLabLogo } from '@/components/ui/KebabLabLogo'
 import { motion, AnimatePresence } from 'framer-motion'
+import { triggerPWAInstall } from '@/components/common/PWAInstallPrompt'
 import { useCart } from '@/lib/store/cartStore'
 import { isOpenNow } from '@/lib/utils/isOpen'
 import { useTheme } from '@/lib/theme-provider'
@@ -15,6 +16,7 @@ const NAV_LINKS = [
   { href: '/menu', label: 'Menu' },
   { href: '/deals', label: 'Offers' },
   { href: '/about', label: 'Our Story' },
+  { href: '/faq', label: 'FAQ' },
 ]
 
 export function Navbar() {
@@ -109,6 +111,18 @@ export function Navbar() {
                 )} />
                 {open ? 'Accepting Orders' : 'Closed'}
               </motion.div>
+
+              {/* Install App Trigger */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => triggerPWAInstall()}
+                className="hidden md:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-gold/10 border border-brand-gold/20 text-brand-gold hover:bg-brand-gold/20 transition-all duration-200"
+                aria-label="Install App"
+              >
+                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">App</span>
+              </motion.button>
 
               <div className="h-6 w-[1px] bg-brand-border/50 hidden md:block" />
 

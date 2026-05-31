@@ -30,7 +30,7 @@ const securityHeaders = [
       "img-src 'self' blob: data: https://*.supabase.co https://images.unsplash.com https://cdn.pixabay.com",
       "font-src 'self' https://fonts.gstatic.com",
       "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.resend.com wss://*.supabase.co",
-      "frame-src 'self' https://js.stripe.com https://*.supabase.co",
+      "frame-src 'self' https://js.stripe.com https://*.supabase.co https://maps.google.com https://www.google.com",
       "worker-src blob: 'self'",
       "manifest-src 'self'",
       "base-uri 'self'",
@@ -41,6 +41,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  reactStrictMode: true,
   turbopack: {
     root: path.resolve(__dirname),
   },

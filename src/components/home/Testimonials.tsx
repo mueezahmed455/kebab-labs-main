@@ -4,46 +4,52 @@ import { Star, Quote } from 'lucide-react'
 
 const REVIEWS = [
   {
-    name: 'Aisha R.',
+    name: 'Alperhan R.',
     rating: 5,
     date: '2 weeks ago',
-    text: "Honestly the best kebab I've had in Burnley. The lamb shawarma is something else — perfectly seasoned, falling apart tender. The naan was fresh and the chilli sauce has a proper kick to it. Won't be going anywhere else.",
-    item: 'Lamb Shawarma',
+    text: 'Great team, professional boss — amazing place to eat. The food was fresh, hot and very tasty with generous portions. Honestly the best kebab spot in Burnley.',
+    item: 'Kebab Platter',
+    source: 'Google',
   },
   {
     name: 'James T.',
     rating: 5,
     date: '1 month ago',
-    text: 'Ordered the Kebab Lab Special for the family — absolutely loaded with kobeda, shish, donner, both shawarmas all on the same naan. The quality is consistent every single time. 10/10.',
-    item: 'Kebab Lab Special',
+    text: 'Ordered the party kebab for 6 people — well worth the money, top quality taste, plenty of it. The owner is passionate about his quality and it really shows.',
+    item: 'Sharing Platter',
+    source: 'TripAdvisor',
   },
   {
     name: 'Fatima K.',
     rating: 5,
     date: '3 weeks ago',
-    text: 'The chicken tikka shish is incredible — you can taste the charcoal. Everything comes out fresh, hot and generous. The online ordering is dead easy. Delivery was quicker than expected.',
+    text: 'Food was delicious and hot with big portions — real value for money. Delivery was quick with a lovely friendly driver who followed the instructions perfectly.',
     item: 'Chicken Tikka',
+    source: 'Google',
   },
   {
     name: 'Mohammed A.',
     rating: 5,
     date: '5 days ago',
-    text: 'Tried the Asian Special pizza and it was properly different — not your typical takeaway pizza. Clay oven makes a real difference to the base. Ordered twice this week already.',
+    text: 'Tried the Asian Special pizza — properly different from anything else in Burnley. Clay oven makes a huge difference to the base. Ordered twice this week already.',
     item: 'Asian Special Pizza',
+    source: 'Uber Eats',
   },
   {
     name: 'Sarah P.',
     rating: 5,
     date: '2 months ago',
-    text: 'Visited with friends for the sharing platter and we were all blown away. The food comes out piping hot and the portions are very generous. This is proper quality takeaway food.',
+    text: 'Visited with friends for the Mix Shawarma Platter and we were all blown away. Food comes out piping hot and the portions are very generous. Nice and friendly service too.',
     item: 'Mix Shawarma Platter',
+    source: 'TripAdvisor',
   },
   {
     name: 'Imran H.',
     rating: 5,
     date: '1 week ago',
-    text: 'The kobeda is the best in town — proper spiced minced lamb cooked perfectly over coal. The cheesy kobeda bites are addictive. Halal certified and always consistent. A gem.',
+    text: 'The kobeda is unreal — proper spiced and cooked over charcoal. You can actually taste the difference. Halal certified, consistently excellent, and the cheesy bites are addictive.',
     item: 'Double Kobeda',
+    source: 'Google',
   },
 ]
 
@@ -95,7 +101,7 @@ export function Testimonials() {
           >
             <Stars />
             <span className="text-[10px] font-semibold tracking-[0.22em] uppercase" style={{ color: '#c9953a' }}>
-              4.9 Stars · 200+ Reviews
+              4.3 Stars · 500+ Reviews
             </span>
           </div>
           <h2
@@ -160,7 +166,7 @@ export function Testimonials() {
 
                 <div className="flex flex-col items-end gap-1">
                   <Stars count={review.rating} />
-                  <span className="text-[10px] text-brand-dim">Google Review</span>
+                  <span className="text-[10px] text-brand-dim">{review.source} Review</span>
                 </div>
               </div>
             </motion.div>
@@ -190,15 +196,15 @@ export function Testimonials() {
                 </div>
               ))}
             </div>
-            <span>200+ happy customers</span>
+            <span>500+ happy customers</span>
           </div>
           <div className="w-px h-4 bg-brand-border hidden sm:block" />
           <div className="flex items-center gap-1.5">
             <Stars />
-            <span>4.9 average rating</span>
+            <span>4.3 average rating</span>
           </div>
           <div className="w-px h-4 bg-brand-border hidden sm:block" />
-          <span>Verified Google Reviews</span>
+          <span>Google · Uber Eats · TripAdvisor</span>
         </motion.div>
       </div>
     </section>

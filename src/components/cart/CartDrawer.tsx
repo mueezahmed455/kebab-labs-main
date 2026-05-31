@@ -82,8 +82,11 @@ export function CartDrawer() {
             <div className="flex-1 overflow-y-auto px-5">
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-                  <div className="text-5xl mb-4">🧪</div>
-                  <p className="text-brand-muted text-sm">Your cart is empty</p>
+                  <div className="w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-5 bg-brand-surface border border-brand-border/60 text-brand-dim relative shadow-lg">
+                    <ShoppingCart className="w-6 h-6 stroke-[1.2] text-brand-dim" />
+                    <div className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-brand-gold animate-pulse" />
+                  </div>
+                  <p className="text-brand-text font-bold text-sm tracking-wide">Your basket is empty</p>
                   <p className="text-brand-dim text-xs mt-1">Add items from the menu to get started</p>
                   <Link
                     href="/menu"

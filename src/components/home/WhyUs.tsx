@@ -27,16 +27,16 @@ const REASONS = [
   {
     icon: Award,
     title: "Burnley's Best Since Day One",
-    desc: 'Trusted by thousands of local families and rated 4.9 stars. We earned our reputation one kebab at a time.',
+    desc: 'Trusted by hundreds of local families. 4.3★ average across 500+ reviews. FHRS 5 food hygiene. We earned our reputation one kebab at a time.',
     color: '#c9953a',
   },
 ]
 
 const STATS = [
-  { value: '4.9', label: 'Review Rating', color: '#c9953a' },
-  { value: '6',   label: 'Days Open',      color: '#c94d15' },
-  { value: '3mi', label: 'Delivery Radius', color: '#b81c1c' },
-  { value: '100+',label: 'Lab Formulas',    color: '#c9953a' },
+  { value: '4.3★', label: 'Avg Rating',       color: '#c9953a' },
+  { value: '6',    label: 'Days Open',         color: '#c94d15' },
+  { value: '3mi',  label: 'Delivery Radius',   color: '#b81c1c' },
+  { value: '500+', label: 'Happy Customers',   color: '#c9953a' },
 ]
 
 const fadeInLeft = {
@@ -80,15 +80,15 @@ export function WhyUs() {
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
             >
-              <p className="text-[10px] font-semibold uppercase mb-4 tracking-[0.3em] text-brand-gold">
-                The Distinction
-              </p>
-              <h2 className="font-display italic leading-[0.9] tracking-tight mb-12"
+              <h2 className="font-display italic leading-[0.9] tracking-tight mb-4"
                 style={{ fontSize: 'clamp(2.5rem,6vw,4rem)' }}>
-                <span className="text-brand-text">The Science</span>
+                <span className="text-brand-text">Why people</span>
                 <br />
-                <span className="text-gradient-fire">of Flavour</span>
+                <span className="text-gradient-fire">keep coming back</span>
               </h2>
+              <p className="text-brand-muted text-base leading-relaxed mb-12 max-w-sm">
+                We cook with a real clay oven, fresh ingredients daily, and obsess over every detail.
+              </p>
             </motion.div>
 
             <div className="space-y-8">

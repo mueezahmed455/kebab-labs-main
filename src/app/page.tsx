@@ -5,6 +5,7 @@ import { CategoryGrid } from '@/components/home/CategoryGrid'
 import { PopularItems } from '@/components/home/PopularItems'
 import { WhyUs } from '@/components/home/WhyUs'
 import { Testimonials } from '@/components/home/Testimonials'
+import { FindUs } from '@/components/home/FindUs'
 import { PageTransition } from '@/components/common/PageTransition'
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function HomePage() {
       <PopularItems />
       <Testimonials />
       <WhyUs />
+      <FindUs />
     </PageTransition>
   )
 }

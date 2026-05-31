@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { FlaskConical, Flame, Leaf, Award, Star, Clock, Truck, Users, ArrowRight } from 'lucide-react'
+import { FlaskConical, Flame, Leaf, Award, Star, Clock, Truck, Users, ArrowRight, MapPin, Navigation, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { BRAND } from '@/lib/data/brand'
 import { PageTransition } from '@/components/common/PageTransition'
@@ -22,7 +22,7 @@ const VALUES = [
   {
     icon: Award,
     title: 'Quality First',
-    desc: "We source premium cuts, use authentic spice blends, and never compromise on portion size. Our 4.9★ rating reflects a commitment that never wavers.",
+    desc: "We source premium cuts, use authentic spice blends, and never compromise on portion size. Our 4.3★ average across 500+ reviews reflects a commitment that never wavers.",
     color: '#c9953a',
   },
   {
@@ -128,8 +128,8 @@ export default function AboutPage() {
                   backdropFilter: 'blur(12px)',
                 }}
               >
-                <p className="text-brand-gold font-display italic text-2xl">4.9★</p>
-                <p className="text-brand-muted text-xs">200+ Google Reviews</p>
+                <p className="text-brand-gold font-display italic text-2xl">4.3★</p>
+                <p className="text-brand-muted text-xs">500+ Reviews · FHRS 5</p>
               </div>
             </motion.div>
           </div>
@@ -189,10 +189,10 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
-              { icon: Star,  value: '4.9★',        label: 'Average Rating',   color: '#c9953a' },
+              { icon: Star,  value: '4.3★',        label: 'Average Rating',   color: '#c9953a' },
               { icon: Clock, value: '4PM–12:40AM', label: 'Open 6 Days',      color: '#c94d15' },
               { icon: Truck, value: '3 miles',      label: 'Delivery Radius',  color: '#0f9b5e' },
-              { icon: Users, value: '500+',         label: 'Happy Customers',  color: '#c9953a' },
+              { icon: Users, value: 'FHRS 5',       label: 'Food Hygiene',     color: '#0f9b5e' },
             ].map((s) => (
               <div key={s.label} className="flex flex-col items-center gap-2">
                 <s.icon className="w-5 h-5" style={{ color: s.color }} />
@@ -235,6 +235,92 @@ export default function AboutPage() {
                 <p className="text-brand-muted text-sm mt-1">{t.desc}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Find Us */}
+      <section className="py-16 md:py-24 bg-brand-bg border-t border-brand-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="font-display italic text-4xl md:text-5xl text-brand-text tracking-tight leading-[0.9]">
+              Find <span className="text-gradient-fire">Us</span>
+            </h2>
+            <p className="text-brand-muted mt-3">123 Colne Road, Burnley — open 6 days a week from 4pm</p>
+          </motion.div>
+          <div className="grid lg:grid-cols-3 gap-6 items-stretch">
+            {/* Map */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="lg:col-span-2 rounded-2xl overflow-hidden"
+              style={{ border: '1px solid var(--color-brand-border)', minHeight: '360px' }}
+            >
+              <iframe
+                src="https://maps.google.com/maps?q=53.8007574,-2.2364854&hl=en&z=17&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0, minHeight: '360px', display: 'block', filter: 'invert(0.9) hue-rotate(185deg) saturate(0.8) brightness(0.85)' }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="The Kebab Lab on Google Maps"
+              />
+            </motion.div>
+            {/* Info */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="rounded-2xl p-6 flex flex-col gap-5"
+              style={{ background: 'var(--color-brand-card)', border: '1px solid var(--color-brand-border)' }}
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(201,77,21,0.1)', border: '1px solid rgba(201,77,21,0.2)' }}>
+                  <MapPin className="w-5 h-5" style={{ color: 'var(--color-brand-fire)' }} />
+                </div>
+                <div>
+                  <p className="text-brand-text font-semibold text-sm mb-0.5">Address</p>
+                  <p className="text-brand-muted text-sm">123 Colne Road<br />Burnley, BB10 1LN</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(15,155,94,0.1)', border: '1px solid rgba(15,155,94,0.2)' }}>
+                  <Phone className="w-5 h-5" style={{ color: 'var(--color-brand-green)' }} />
+                </div>
+                <div>
+                  <p className="text-brand-text font-semibold text-sm mb-0.5">Phone</p>
+                  <a href="tel:01282454626" className="text-brand-muted text-sm hover:text-brand-green transition-colors">01282 454 626</a>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(201,149,58,0.1)', border: '1px solid rgba(201,149,58,0.2)' }}>
+                  <Clock className="w-5 h-5" style={{ color: '#c9953a' }} />
+                </div>
+                <div>
+                  <p className="text-brand-text font-semibold text-sm mb-0.5">Hours</p>
+                  <p className="text-brand-muted text-sm">Mon &amp; Wed–Sun: 4:00pm – 12:40am</p>
+                  <p className="text-red-400 text-sm font-medium mt-0.5">Tuesday: Closed</p>
+                </div>
+              </div>
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=The+Kebab+Lab+Burnley&destination_place_id=ChIJh5-X8-x3h0cRwrKo_qDz5dg"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-white transition-all active:scale-95"
+                style={{ background: 'var(--color-brand-fire)' }}
+              >
+                <Navigation className="w-4 h-4" />
+                Get Directions
+              </a>
+            </motion.div>
           </div>
         </div>
       </section>

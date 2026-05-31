@@ -1,5 +1,4 @@
 'use client'
-import { useId } from 'react'
 
 interface KebabLabLogoProps {
   size?: number
@@ -8,7 +7,6 @@ interface KebabLabLogoProps {
 }
 
 export function KebabLabLogo({ size = 40, showWordmark = true, className = '' }: KebabLabLogoProps) {
-  const uid = useId().replace(/:/g, 'x')
   const iw = Math.round(size * 0.72)
 
   return (
@@ -16,67 +14,119 @@ export function KebabLabLogo({ size = 40, showWordmark = true, className = '' }:
       <svg
         width={iw}
         height={size}
-        viewBox="0 0 36 50"
+        viewBox="0 0 40 52"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
         <defs>
-          <linearGradient id={`${uid}fg`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#c94d15" />
+          {/* Flask outline gradient */}
+          <linearGradient id="kl-flask" x1="0" y1="0" x2="0.6" y2="1">
+            <stop offset="0%" stopColor="#d46b35" />
             <stop offset="100%" stopColor="#c9953a" />
           </linearGradient>
-          <linearGradient id={`${uid}glass`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#c9953a" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#c94d15" stopOpacity="0.05" />
+          {/* Flask glass fill */}
+          <linearGradient id="kl-glass" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="rgba(212,164,74,0.07)" />
+            <stop offset="100%" stopColor="rgba(201,77,21,0.03)" />
           </linearGradient>
-          <linearGradient id={`${uid}flame`} x1="0.5" y1="0" x2="0.5" y2="1">
-            <stop offset="0%" stopColor="#fde68a" />
-            <stop offset="40%" stopColor="#c9953a" />
-            <stop offset="100%" stopColor="#c94d15" />
+          {/* Outer flame */}
+          <linearGradient id="kl-flame-outer" x1="0.5" y1="0" x2="0.5" y2="1">
+            <stop offset="0%"   stopColor="#fff8a0" />
+            <stop offset="30%"  stopColor="#ffb040" />
+            <stop offset="70%"  stopColor="#e05520" />
+            <stop offset="100%" stopColor="#c93810" />
           </linearGradient>
-          <filter id={`${uid}glow`} x="-60%" y="-60%" width="220%" height="220%">
-            <feGaussianBlur stdDeviation="1.5" result="b" />
+          {/* Inner flame core */}
+          <linearGradient id="kl-flame-inner" x1="0.5" y1="0" x2="0.5" y2="1">
+            <stop offset="0%"   stopColor="#ffffff"  stopOpacity="0.95" />
+            <stop offset="55%"  stopColor="#fff5c0" />
+            <stop offset="100%" stopColor="#ffe080" />
+          </linearGradient>
+          {/* Flame glow filter */}
+          <filter id="kl-glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
             <feMerge>
-              <feMergeNode in="b" />
+              <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
 
-        <path d="M14 1H22V15L34 44Q36 50 18 50Q0 50 2 44L14 15V1Z" fill={`url(#${uid}glass)`} />
-        <path d="M14 1H22V15L34 44Q36 50 18 50Q0 50 2 44L14 15V1Z"
-          stroke={`url(#${uid}fg)`} strokeWidth="1.2" fill="none" strokeLinejoin="round" />
-        <rect x="11" y="0" width="14" height="2.5" rx="1.25" fill={`url(#${uid}fg)`} />
+        {/* Flask body — glass fill */}
+        <path
+          d="M15,2 H25 L28,18 Q38,27 38,43 Q38,52 20,52 Q2,52 2,43 Q2,27 12,18 Z"
+          fill="url(#kl-glass)"
+        />
 
-        <path d="M18 46C11 42 11 31 14.5 25C16 22 18 18 18 18C18 18 20 22 21.5 25C25 31 25 42 18 46Z"
-          fill={`url(#${uid}flame)`} filter={`url(#${uid}glow)`} />
-        <path d="M18 43C15 40 15 33 17 28C17.5 26 18 24 18 24C18 24 18.5 26 19 28C21 33 21 40 18 43Z"
-          fill="#fde68a" opacity="0.5" />
-        <path d="M11.5 17L7 36" stroke="rgba(255,255,255,0.08)" strokeWidth="2" strokeLinecap="round" />
+        {/* Flask body — outline */}
+        <path
+          d="M15,2 H25 L28,18 Q38,27 38,43 Q38,52 20,52 Q2,52 2,43 Q2,27 12,18 Z"
+          stroke="url(#kl-flask)"
+          strokeWidth="1.5"
+          fill="none"
+          strokeLinejoin="round"
+        />
+
+        {/* Neck rim (top lip) */}
+        <line x1="13" y1="2" x2="27" y2="2" stroke="url(#kl-flask)" strokeWidth="1.5" strokeLinecap="round" />
+
+        {/* Measurement marks inside neck */}
+        <line x1="17" y1="8"  x2="21" y2="8"  stroke="rgba(201,149,58,0.35)" strokeWidth="0.8" strokeLinecap="round" />
+        <line x1="17" y1="13" x2="23" y2="13" stroke="rgba(201,149,58,0.25)" strokeWidth="0.8" strokeLinecap="round" />
+
+        {/* Outer flame */}
+        <path
+          d="M20,50 C14,46 11.5,37 15,28 C17,23 19.5,19.5 20,19.5 C20.5,19.5 23,23 25,28 C28.5,37 26,46 20,50 Z"
+          fill="url(#kl-flame-outer)"
+          filter="url(#kl-glow)"
+          opacity="0.92"
+        />
+
+        {/* Inner flame core */}
+        <path
+          d="M20,47 C17,44 16,39 18.5,32 C19.5,29 20,27 20,27 C20,27 20.5,29 21.5,32 C24,39 23,44 20,47 Z"
+          fill="url(#kl-flame-inner)"
+          opacity="0.85"
+        />
+
+        {/* Glass highlight (left side) */}
+        <path
+          d="M10,17 L7,30"
+          stroke="rgba(255,255,255,0.11)"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
       </svg>
 
       {showWordmark && (
         <div style={{ lineHeight: 1 }}>
-          <div className="font-sans text-[10px] font-medium"
+          <div
             style={{
-              fontSize: size * 0.28,
+              fontFamily: 'var(--font-inter), sans-serif',
+              fontSize: size * 0.265,
+              fontWeight: 600,
               color: 'var(--color-brand-muted)',
-              letterSpacing: '0.25em',
-              lineHeight: 1.1,
-            }}>
-            THE KEBAB
+              letterSpacing: '0.24em',
+              lineHeight: 1.15,
+              textTransform: 'uppercase',
+            }}
+          >
+            The Kebab
           </div>
-          <div className="font-display italic leading-none"
+          <div
             style={{
-              fontSize: size * 0.45,
-              background: 'linear-gradient(120deg, #c94d15 20%, #c9953a 80%)',
+              fontFamily: 'var(--font-playfair), Georgia, serif',
+              fontStyle: 'italic',
+              fontSize: size * 0.5,
+              background: 'linear-gradient(120deg, #d46b35 15%, #c9953a 55%, #e0b05a 85%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              letterSpacing: '0.06em',
-              lineHeight: 0.9,
-            }}>
+              letterSpacing: '0.03em',
+              lineHeight: 0.88,
+            }}
+          >
             Lab
           </div>
         </div>

@@ -38,9 +38,9 @@ export function Footer() {
         >
           {/* Brand */}
           <motion.div variants={fadeUp} className="lg:col-span-1">
-            <div className="mb-5">
-              <KebabLabLogo size={44} showWordmark={true} />
-            </div>
+             <div className="mb-5">
+               <KebabLabLogo size={44} showWordmark={true} />
+             </div>
 
             <p className="text-brand-muted text-sm leading-relaxed mb-5 max-w-xs">
               Where fire meets flavour. Handcrafted kebabs, stone-baked pizzas &amp; fresh shawarma in Burnley.
@@ -83,6 +83,7 @@ export function Footer() {
                 { href: '/menu', label: 'Full Menu' },
                 { href: '/deals', label: 'Meal Deals' },
                 { href: '/about', label: 'About Us' },
+                { href: '/faq', label: 'FAQ' },
                 { href: '/menu#pizza', label: 'Pizza' },
                 { href: '/menu#sharing', label: 'Sharing Platters' },
               ].map((link) => (
