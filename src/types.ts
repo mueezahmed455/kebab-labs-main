@@ -35,4 +35,4 @@ export interface Reservation {
   specialRequests?: string;
 }
 
-export type ActiveTab = "home" | "menu" | "cart" | "story";
+export type ActiveTab = "home" | "menu" | "cart" | "story" | "admin";

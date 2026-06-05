@@ -14,6 +14,10 @@ import FooterOrderStatusTracker from "./components/FooterOrderStatusTracker";
 import ParticleCanvas from "./components/ParticleCanvas";
 import CursorGlow from "./components/CursorGlow";
 import { User, MapPin, History, X, Star, RefreshCw } from "lucide-react";
+import HeroVisuals3D from "./components/HeroVisuals3D";
+import AccessibilityPanel from "./components/AccessibilityPanel";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import { trackEvent } from "./lib/analytics";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("home");
@@ -93,6 +97,7 @@ export default function App() {
     <div className="min-h-screen bg-background text-on-background font-sans flex flex-col justify-between antialiased selection:bg-primary/25 selection:text-primary relative pb-20 md:pb-0">
       {/* Global 3D Effects */}
       <ParticleCanvas />
+      <HeroVisuals3D />
       <CursorGlow />
 
       {/* Ambient smoke background */}
@@ -119,7 +124,12 @@ export default function App() {
         )}
         {activeTab === "cart" && (
           <div className="animate-cinematic-reveal">
-            <ShoppingCart cartItems={cartItems} onUpdateQuantity={handleUpdateQuantity} onRemoveItem={handleRemoveItem} onClearCart={handleClearCart} />
+            <ShoppingCart cartItems={cartItems} onUpdateQuantity={handleUpdateQuantity} onRemoveItem={handleRemoveItem} onClearCart={handleClearCart} onAddItem={(item) => handleAddToCart(item)} />
+          </div>
+        )}
+        {activeTab === "admin" && (
+          <div className="animate-cinematic-reveal">
+            <AdminDashboard onClose={() => setActiveTab("home")} />
           </div>
         )}
         {activeTab === "story" && (
@@ -173,6 +183,8 @@ ow-hidden glass-panel relative shadow-2xl animate-fade-in p-6 sm:p-8 space-y-6">
           </div>
         </div>
       )}
+
+      <AccessibilityPanel />
 
       <FeedbackDialog isOpen={feedbackDialogState.isOpen} transactionId={feedbackDialogState.txId} onClose={() => setFeedbackDialogState({ isOpen: false, txId: "" })} onSubmit={() => { setSubmittedFeedback(prev => ({ ...prev, [feedbackDialogState.txId]: true })); }} />
     </div>

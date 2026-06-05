@@ -6,6 +6,7 @@ import {
   Heart, MessageSquare, Volume2, VolumeX, Eye, Info, CheckSquare, Coffee 
 } from "lucide-react";
 import ThreeDCard from "./ThreeDCard";
+import { trackEvent } from "../lib/analytics";
 
 interface MenuBrowserProps {
   onAddToCart: (item: MenuItem, notes?: string, selectedSize?: string) => void;
@@ -72,6 +73,7 @@ export default function MenuBrowser({ onAddToCart, cartItemIds }: MenuBrowserPro
 
   const handleApplyDishToCart = () => {
     if (!selectedDish) return;
+    trackEvent("add_to_cart", { itemName: selectedDish.name, price: activePrice, category: selectedDish.category });
     const finalNotes = `[Temp: ${doneness}] [Seasoning: ${saltLevel}] ${dishNotes}`.trim();
     onAddToCart(selectedDish, finalNotes, chosenSize || undefined);
     speakText(`Added ${selectedDish.name} to checkout protocol!`);
@@ -81,6 +83,7 @@ export default function MenuBrowser({ onAddToCart, cartItemIds }: MenuBrowserPro
   const handleQuickAdd = (dish: MenuItem, e: React.MouseEvent) => {
     e.stopPropagation();
     onAddToCart(dish);
+    trackEvent("add_to_cart", { itemName: dish.name, price: dish.price, category: dish.category });
     speakText(`Added ${dish.name} directly to your collection carriage!`);
   };
 
@@ -352,6 +355,7 @@ export default function MenuBrowser({ onAddToCart, cartItemIds }: MenuBrowserPro
               onClick={() => {
                 setSelectedCategory(cat.name);
                 setSearchQuery("");
+                trackEvent("menu_view", { category: cat.name });
                 speakText(`Entering ${cat.name} takeaway category.`);
               }}
               className={`px-6 py-4 font-bold text-xs uppercase tracking-[0.12em] rounded-xl border transition-all duration-300 cursor-pointer flex items-center gap-2 shrink-0 snap-start select-none ${

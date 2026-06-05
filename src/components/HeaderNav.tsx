@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ActiveTab } from "../types";
 import { BRAND } from "../data";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Shield } from "lucide-react";
 import LogoNanoBanaPro from "./LogoNanoBanaPro";
 
 interface HeaderNavProps {
@@ -23,6 +23,7 @@ export default function HeaderNav({ activeTab, setActiveTab, cartCount }: Header
     { id: "home" as const, label: "Home" },
     { id: "menu" as const, label: "Menu" },
     { id: "story" as const, label: "Story" },
+    { id: "admin" as const, label: "Admin" },
   ];
 
   return (

@@ -1,0 +1,13 @@
+import { useState, useEffect } from "react";
+import { Accessibility, Eye, Volume2, Type, ZoomIn, RotateCcw, X, Sun } from "lucide-react";
+
+export interface AccessibilitySettings {
+  highContrast: boolean; largeText: boolean; extraLargeText: boolean; reduceMotion: boolean;
+  dyslexiaFont: boolean; screenReader: boolean; focusIndicators: boolean;
+  lineHeight: "normal" | "relaxed" | "loose";
+}
+
+const DEFAULTS: AccessibilitySettings = { highContrast:false, largeText:false, extraLargeText:false, reduceMotion:false, dyslexiaFont:false, screenReader:false, focusIndicators:false, lineHeight:"normal" };
+
+function load(): AccessibilitySettings { try { const s=localStorage.getItem("kl_a11y_settings"); if(s) return {...DEFAULTS,...JSON.parse(s)}; } catch{} return DEFAULTS; }
+function apply(s: AccessibilitySettings) { const r=document.documentElement; r.classList.toggle("a11y-high-contrast",s.highContrast); r.classList.toggle("a11y-large-text",s.largeText); r.classList.toggle("a11y-xl-text",s.extraLargeText); r.classList.toggle("a11y-reduce-motion",s.reduceMotion); r.classList.toggle("a11y-dyslexia-font",s.dyslexiaFont); r.classList.toggle("a11y-focus-indicators",s.focusIndicators); r.setAttribute("data-line-height",s.lineHeight); }

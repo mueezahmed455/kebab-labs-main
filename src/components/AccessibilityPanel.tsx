@@ -1,0 +1,55 @@
+import React, { useState, useEffect } from "react";
+import { Accessibility, Eye, Volume2, Type, ZoomIn, RotateCcw, X, Sun } from "lucide-react";
+
+export interface AccessibilitySettings {
+  highContrast: boolean; largeText: boolean; extraLargeText: boolean; reduceMotion: boolean;
+  dyslexiaFont: boolean; screenReader: boolean; focusIndicators: boolean;
+  lineHeight: "normal" | "relaxed" | "loose";
+}
+
+const DEFAULTS: AccessibilitySettings = { highContrast:false, largeText:false, extraLargeText:false, reduceMotion:false, dyslexiaFont:false, screenReader:false, focusIndicators:false, lineHeight:"normal" };
+
+function load(): AccessibilitySettings { try { const s=localStorage.getItem("kl_a11y_settings"); if(s) return {...DEFAULTS,...JSON.parse(s)}; } catch{} return DEFAULTS; }
+function apply(s: AccessibilitySettings) { const r=document.documentElement; r.classList.toggle("a11y-high-contrast",s.highContrast); r.classList.toggle("a11y-large-text",s.largeText); r.classList.toggle("a11y-xl-text",s.extraLargeText); r.classList.toggle("a11y-reduce-motion",s.reduceMotion); r.classList.toggle("a11y-dyslexia-font",s.dyslexiaFont); r.classList.toggle("a11y-focus-indicators",s.focusIndicators); r.setAttribute("data-line-height",s.lineHeight); }
+
+export default function AccessibilityPanel() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [s, setS] = useState<AccessibilitySettings>(load);
+  useEffect(() => { apply(s); localStorage.setItem("kl_a11y_settings",JSON.stringify(s)); }, [s]);
+  useEffect(() => { apply(load()); }, []);
+  const tog = (k: keyof AccessibilitySettings) => setS(p => ({...p,[k]:!p[k]}));
+  const speak = () => { if("speechSynthesis" in window) { window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(document.body.innerText.slice(0,2000)); u.rate=1; window.speechSynthesis.speak(u); } };
+  return (<>
+    <button onClick={() => setIsOpen(!isOpen)} className="fixed bottom-6 right-6 z-[115] w-12 h-12 rounded-full bg-[var(--app-primary)] text-[#050505] flex items-center justify-center shadow-[0_0_20px_rgba(197,160,89,0.3)] hover:shadow-[0_0_30px_rgba(197,160,89,0.5)] transition-all hover:scale-110 cursor-pointer" aria-label="Accessibility settings"><Accessibility className="w-5 h-5" /></button>
+    {isOpen && (<div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
+      <div className="bg-[#0a0a0d] border border-[var(--app-primary)]/20 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+        <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-full bg-[var(--app-primary)]/10 border border-[var(--app-primary)]/30 flex items-center justify-center"><Accessibility className="w-5 h-5 text-[var(--app-primary)]" /></div><div><h3 className="font-display text-lg font-bold text-white">Accessibility</h3><p className="text-[10px] text-gray-400 uppercase tracking-widest">Customize your experience</p></div></div>
+          <button onClick={() => setIsOpen(false)} className="w-9 h-9 rounded-full bg-neutral-800/60 border border-white/10 flex items-center justify-center text-white hover:text-[var(--app-primary)] cursor-pointer"><X className="w-4 h-4" /></button>
+        </div>
+        <div className="p-6 space-y-3 max-h-[60vh] overflow-y-auto">
+          <TB icon={<Eye className="w-4 h-4" />} l="High Contrast" d="Increases visual contrast" a={s.highContrast} t={() => tog("highContrast")} />
+          <TB icon={<Type className="w-4 h-4" />} l="Large Text" d="Increases font size" a={s.largeText} t={() => { tog("largeText"); if(!s.largeText) setS(p=>({...p,extraLargeText:false})); }} />
+          <TB icon={<ZoomIn className="w-4 h-4" />} l="Extra Large Text" d="Maximum font size" a={s.extraLargeText} t={() => { tog("extraLargeText"); if(!s.extraLargeText) setS(p=>({...p,largeText:false})); }} />
+          <TB icon={<Sun className="w-4 h-4" />} l="Reduce Motion" d="Disables animations" a={s.reduceMotion} t={() => tog("reduceMotion")} />
+          <TB icon={<Type className="w-4 h-4" />} l="Dyslexia Font" d="OpenDyslexic typeface" a={s.dyslexiaFont} t={() => tog("dyslexiaFont")} />
+          <TB icon={<Eye className="w-4 h-4" />} l="Focus Indicators" d="Prominent focus outlines" a={s.focusIndicators} t={() => tog("focusIndicators")} />
+          <div className="pt-3 border-t border-white/5"><p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-2">Line Spacing</p><div className="grid grid-cols-3 gap-2">{["normal","relaxed","loose"].map(lh => (<button key={lh} onClick={() => setS(p=>({...p,lineHeight:lh as AccessibilitySettings["lineHeight"]}))} className={"py-2 px-3 text-[10px] font-bold uppercase tracking-wider rounded-lg border transition-all cursor-pointer " + (s.lineHeight===lh ? "bg-[var(--app-primary)]/20 border-[var(--app-primary)] text-[var(--app-primary)]" : "bg-black/40 border-neutral-700 text-gray-400")}>{lh}</button>))}</div></div>
+          <div className="pt-3 border-t border-white/5"><button onClick={speak} className="w-full py-3 rounded-lg bg-[var(--app-primary)]/10 border border-[var(--app-primary)]/20 text-[var(--app-primary)] font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[var(--app-primary)]/20 transition-colors cursor-pointer"><Volume2 className="w-4 h-4" /> Read Page Aloud</button></div>
+        </div>
+        <div className="p-4 border-t border-white/10 flex justify-between">
+          <button onClick={() => setS(DEFAULTS)} className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white flex items-center gap-2 cursor-pointer"><RotateCcw className="w-3 h-3" /> Reset</button>
+          <button onClick={() => setIsOpen(false)} className="px-6 py-2 rounded-lg bg-[var(--app-primary)] text-[#050505] font-bold text-[10px] uppercase tracking-widest">Done</button>
+        </div>
+      </div>
+    </div>)}
+  </>);
+}
+
+function TB({icon,l,d,a,t}:{icon:React.ReactNode;l:string;d:string;a:boolean;t:() => void}) {
+  return (<button onClick={t} className={"w-full p-4 rounded-xl border flex items-start gap-3 transition-all cursor-pointer text-left " + (a ? "bg-[var(--app-primary)]/10 border-[var(--app-primary)]/40" : "bg-black/30 border-neutral-700/50 hover:border-neutral-600")}>
+    <div className={"mt-0.5 " + (a ? "text-[var(--app-primary)]" : "text-gray-500")}>{icon}</div>
+    <div className="flex-grow"><p className={"text-xs font-bold " + (a ? "text-[var(--app-primary)]" : "text-gray-300")}>{l}</p><p className="text-[10px] text-gray-500 mt-0.5">{d}</p></div>
+    <div className={"w-10 h-6 rounded-full flex items-center transition-all p-0.5 shrink-0 mt-0.5 " + (a ? "bg-[var(--app-primary)] justify-end" : "bg-neutral-700 justify-start")}><div className="w-5 h-5 rounded-full bg-white shadow-sm" /></div>
+  </button>);
+}

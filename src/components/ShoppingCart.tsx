@@ -3,15 +3,17 @@ import Confetti from "react-confetti";
 import { CartItem } from "../types";
 import { BRAND } from "../data";
 import { Trash2, Plus, Minus, MapPin, Clock, Calendar, ShieldCheck, ShoppingBag, Sparkles, ClipboardCheck, X, Store, Truck, CreditCard, Smartphone } from "lucide-react";
+import UpsellSuggestions from "./UpsellSuggestions";
+import { trackEvent } from "../lib/analytics";
 
 interface ShoppingCartProps {
   cartItems: CartItem[];
   onUpdateQuantity: (id: string, delta: number) => void;
   onRemoveItem: (id: string) => void;
-  onClearCart: () => void;
+  onClearCart: () => void; onAddItem?: (item: import("../types").MenuItem) => void;
 }
 
-export default function ShoppingCart({ cartItems, onUpdateQuantity, onRemoveItem, onClearCart }: ShoppingCartProps) {
+export default function ShoppingCart({ cartItems, onUpdateQuantity, onRemoveItem, onClearCart, onAddItem }: ShoppingCartProps) {
   const [takeawayMethod, setTakeawayMethod] = useState<"collection" | "delivery">("collection");
   const [address, setAddress] = useState(() => typeof window !== "undefined" ? localStorage.getItem("kebabLab_deliveryAddress") || "" : "");
   const [deliveryType, setDeliveryType] = useState<"ASAP" | "Schedule">("ASAP");
@@ -106,6 +108,7 @@ export default function ShoppingCart({ cartItems, onUpdateQuantity, onRemoveItem
       const receipt = "LAB-" + Math.floor(100000 + Math.random() * 900000);
       setReceiptCode(receipt);
       setIsCheckoutSubmitted(true);
+      trackEvent("checkout_complete", { total: total.toFixed(2), receipt, method: "apple_pay" });
       await paymentResponse.complete("success");
     } catch (err) {
       console.error("Payment failed:", err);
@@ -117,9 +120,11 @@ export default function ShoppingCart({ cartItems, onUpdateQuantity, onRemoveItem
 
   const handleCheckoutSubmit = () => {
     if (cartItems.length === 0) return;
+    trackEvent("checkout_start", { total: total.toFixed(2), itemCount: cartItems.length });
     const receipt = "LAB-" + Math.floor(100000 + Math.random() * 900000);
     setReceiptCode(receipt);
     setIsCheckoutSubmitted(true);
+    trackEvent("checkout_complete", { total: total.toFixed(2), receipt: receipt });
   };
 
   const handleResetCheckout = () => {
@@ -174,6 +179,7 @@ ext-gray-400 italic line-clamp-1 py-1 px-2 bg-neutral-900 rounded mt-1 w-fit">{c
           </div>
 
           <div className="md:col-span-5 space-y-6">
+            <UpsellSuggestions cartItems={cartItems} onAddItem={(item) => { trackEvent("upsell_clicked", { itemName: item.name }); /* handled via onAddToCart */ }} />
             <div className="glass-panel rounded-2xl p-5 border border-[var(--app-primary)]/10 space-y-4">
               <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Order Type</span>
               <div className="grid grid-cols-2 gap-3">
