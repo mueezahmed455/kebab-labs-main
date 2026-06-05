@@ -6,14 +6,14 @@ Order authentic kebabs, shawarma, pizzas, burgers and more online with Apple Pay
 
 ## Features
 
-- Full menu with 80+ items across 12 categories
-- Square payment integration (card + Apple Pay)
-- Shopping cart with size selection and custom notes
-- Order status tracking with receipt codes
-- Responsive mobile-first design
-- 3D particle effects and interactive UI
-- Glassmorphism navigation with scroll awareness
-- Open/closed status indicator
+- **Full Menu Browser:** 80+ items across 12 categories with quick-add and deep customization.
+- **Admin Dashboard:** Real-time order management, analytics overview, and menu control.
+- **Advanced Analytics:** Local-first conversion funnel tracking, popular items, and revenue data.
+- **Cinematic UI:** 3D hero visuals, particle canvas, and cursor glow effects.
+- **Accessibility Panel:** High contrast mode, font scaling, and dyslexia-friendly typography.
+- **Smart Checkout:** Square payment integration (card + Apple Pay) with receipt generation.
+- **Order Tracking:** Persistent status tracking with receipt codes.
+- **Upsell Engine:** Contextual "Perfect Match" suggestions based on cart contents.
 
 ## Tech Stack
 
